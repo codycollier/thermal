@@ -1,0 +1,55 @@
+--------------------------------------------------------------------------------
+:: notes
+--------------------------------------------------------------------------------
+
+
+--------------------------------------
+:: reference
+--------------------------------------
+starting point: 
+protocol (v2.1-pre)
+* https://github.com/telehash/telehash.org/blob/master/protocol.md
+
+
+--------------------------------------
+:: design
+--------------------------------------
+
+------------
+From:
+https://github.com/telehash/telehash.org/blob/master/implementers.md
+
+common api / patterns exposed by switch libs:
+
+- generate a hashname
+    . in: csids (optional)
+    . do: gen new key pair, parts, and hashname
+    . out: hashname
+    . out: parts and keys
+
+- switch creation / initialization
+    . in: parts and keys
+    . do: create a switch
+
+- add seeds
+    . load seeds from something like seeds.json
+
+- start channel
+    . in: hashname, type, initial json/body
+    . do: initiate a channel
+    . out: call an optional callback
+
+- listen for channel
+    . in: channel type and callback/event trigger
+    . do: take action for incoming new channel of that type
+
+------------
+
+
+
+
+
+
+
+
+-eof
