@@ -10,6 +10,9 @@ starting point:
 protocol (v2.1-pre)
 * https://github.com/telehash/telehash.org/blob/master/protocol.md
 
+github / go / project layout reference:
+https://code.google.com/p/go-wiki/wiki/GithubCodeLayout
+
 
 --------------------------------------
 :: design
