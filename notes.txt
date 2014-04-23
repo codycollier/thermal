@@ -19,8 +19,11 @@ go / workspace / project layout references:
 :: design
 --------------------------------------
 
+-----------------------
+: client api
+-----------------------
 ------------
-From:
+Adapted From:
 https://github.com/telehash/telehash.org/blob/master/implementers.md
 
 common api / patterns exposed by switch libs:
@@ -46,9 +49,18 @@ common api / patterns exposed by switch libs:
 - listen for channel
     . in: channel type and callback/event trigger
     . do: take action for incoming new channel of that type
-
 ------------
 
+-----------------------
+: Structures / Types
+-----------------------
+
+. switch(s)
+. cipher_set(s)
+. hashname
+. packet(s)
+. line(s)
+. channel(s)
 
 
 
