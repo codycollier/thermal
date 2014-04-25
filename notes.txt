@@ -14,6 +14,11 @@ go / workspace / project layout references:
 * http://golang.org/doc/code.html#Organization
 * https://code.google.com/p/go-wiki/wiki/GithubCodeLayout
 
+cipher sets
+- cs1a
+- cs2a
+- cs3a:
+https://godoc.org/code.google.com/p/go.crypto/nacl/box
 
 --------------------------------------
 :: design
