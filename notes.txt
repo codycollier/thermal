@@ -18,7 +18,8 @@ cipher sets
 - cs1a
 - cs2a
 - cs3a:
-https://godoc.org/code.google.com/p/go.crypto/nacl/box
+https://godoc.org/code.google.com/p/go.crypto/nacl/box          // key pair
+https://godoc.org/code.google.com/p/go.crypto/nacl/secretbox    // line
 
 
 
