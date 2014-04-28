@@ -27,7 +27,7 @@ https://godoc.org/code.google.com/p/go.crypto/nacl/box
 -----------------------
 : client api
 -----------------------
-------------
+------------begin
 Adapted From:
 https://github.com/telehash/telehash.org/blob/master/implementers.md
 
@@ -54,14 +54,32 @@ common api / patterns exposed by switch libs:
 - listen for channel
     . in: channel type and callback/event trigger
     . do: take action for incoming new channel of that type
-------------
+------------end
+
+other notes on client api:
+
+- remember "net" in the std lib
+    . interface of Dial, Listen, Accept.  may be applicable.
+    . PacketConn
+
+
 
 -----------------------
 : Structures / Types
 -----------------------
 
 . switch(s)
-. cipher_set(s)
+
+. cipher_sets
+    . interface CipherSet
+        . generate()
+        . encrypt_line_packet()
+        . decrypt_line_packet()
+    . bundle of CipherSet
+    . cs1a
+    . cs2a
+    . cs3a - Use NaCl to help drive interface design and backfit
+
 . hashname
 . packet(s)
 . line(s)
