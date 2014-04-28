@@ -1,11 +1,11 @@
 --------------------------------------------------------------------------------
-:: notes
+:::::::::::> notes
 --------------------------------------------------------------------------------
 
 
---------------------------------------
-:: reference
---------------------------------------
+----------------------------------------------------------------------------
+::::: reference
+----------------------------------------------------------------------------
 starting point: 
 protocol (v2.1-pre)
 * https://github.com/telehash/telehash.org/blob/master/protocol.md
@@ -20,13 +20,17 @@ cipher sets
 - cs3a:
 https://godoc.org/code.google.com/p/go.crypto/nacl/box
 
---------------------------------------
-:: design
---------------------------------------
 
------------------------
+
+----------------------------------------------------------------------------
+::::: design
+----------------------------------------------------------------------------
+
+----------------------- 
 : client api
 -----------------------
+
+
 ------------begin
 Adapted From:
 https://github.com/telehash/telehash.org/blob/master/implementers.md
@@ -64,21 +68,34 @@ other notes on client api:
 
 
 
------------------------
-: Structures / Types
------------------------
+----------------------------------
+: Structures / Types / Files
+----------------------------------
 
+// local exerciser to help with testing
+./exercise.go
+    . switch
+    . switch.init               // creates cipher sets and hashname
+    . switch.load_from_file     // load previous
+
+
+// Switch provides an api to applications using the library
 . switch(s)
 
+
 . cipher_sets
-    . interface CipherSet
+    . interface for CipherSet
         . generate()
         . encrypt_line_packet()
         . decrypt_line_packet()
-    . bundle of CipherSet
+    . type bundle of CipherSet
     . cs1a
     . cs2a
     . cs3a - Use NaCl to help drive interface design and backfit
+        . generate()
+        . encrypt_line_packet()
+        . decrypt_line_packet()
+
 
 . hashname
 . packet(s)
