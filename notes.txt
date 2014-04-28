@@ -88,10 +88,16 @@ other notes on client api:
         . generate()
         . encrypt_line_packet()
         . decrypt_line_packet()
-    . type bundle of CipherSet
+    . type bundle of CipherSet          // csid, fingerprint, pub, priv
+    . type bundle of CipherSetParts     // csid, fingerprint
     . cs1a
     . cs2a
     . cs3a - Use NaCl to help drive interface design and backfit
+        . type CS3aCypherSet struct {
+            type FingerPrint string
+            type PublicKey []bytes
+            type PrivateKey []bytes
+            }
         . generate()
         . encrypt_line_packet()
         . decrypt_line_packet()
