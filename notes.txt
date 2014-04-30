@@ -8,11 +8,11 @@
 ----------------------------------------------------------------------------
 starting point: 
 protocol (v2.1-pre)
-* https://github.com/telehash/telehash.org/blob/master/protocol.md
+. https://github.com/telehash/telehash.org/blob/master/protocol.md
 
 go / workspace / project layout references:
-* http://golang.org/doc/code.html#Organization
-* https://code.google.com/p/go-wiki/wiki/GithubCodeLayout
+. http://golang.org/doc/code.html#Organization
+. https://code.google.com/p/go-wiki/wiki/GithubCodeLayout
 
 cipher sets
 - cs1a
@@ -27,8 +27,78 @@ https://godoc.org/code.google.com/p/go.crypto/nacl/secretbox    // line
 ::::: design
 ----------------------------------------------------------------------------
 
+
+----------------------------------
+: Telehash Layers and the Lexicon
+----------------------------------
+This is an interpretation and not to be taken as official documentation.  Some
+of these terms conflict or are a little different than the current protocol
+specs.  
+
+
+flow and layers:
+Content flows over channels, inside channel packets.  Channel packets flow over
+lines, inside line packets.  Line packets flow over a network transport, inside
+transport packets (ex. UDP datagrams).
+
+
+* SwitchInstance
+This is sometimes called a switch or a hashname.  A single switch instance is
+started by an application and provides the means for communicating with other
+switches.  At creation, a switch instance generates key pairs for each cipher
+set it can support.  These key pairs are used to generate parts and a
+globally unique hashname.
+
+
+* Channel(s)
+Channels are logical constructs an application uses to pass data back and
+forth.  There is a set of core channel types used by the telehash protocol,
+but an application can also create custom channel types.  The core types are
+"seek", "link", "peer", "connect", "bridge", "path".
+
+
+* Channel Packets (Inner Packets)
+Channel packets contain a json head and a body.  Channel packets are encrypted and
+then sent over a line.  
+
+
+* Line(s)
+Lines are virtual connections between two switch instances, protected by
+encryption.  The encryption used is based on the best common cipher set
+supported by each switch instance.
+
+
+* Line Packets / Telehash Packets (Outer Packets)
+Line packets contain a head and a body.  The body is often a channel packet
+wrapped in an additional layer of encryption.  Line packets wrap and transmit
+these channel packets over a network transport.
+
+The basic line packet types are "open" (open a new line) and "line" (data).
+Despite the name line packet, there can also be other types of outer packets
+which are specific to the network transport (discovery, routing, etc).
+
+
+* Network Transport(s)
+A network transport is used to transmit Telehash Packets.  This could be UDP,
+TCP, HTTP, Bluetooth, and more.
+
+
+-- also:
+
+* Packet
+<2bytes-length-of-head>[Head][Body]
+
+* Cipher Set
+
+* Paths
+
+* DHT
+
+
+
+
 ----------------------- 
-: client api
+: notes on client api
 -----------------------
 
 
@@ -61,13 +131,17 @@ common api / patterns exposed by switch libs:
     . do: take action for incoming new channel of that type
 ------------end
 
+
+
 other notes on client api:
 
-- remember "net" in the std lib
+- remember "net" in the golang std lib
     . interface of Dial, Listen, Accept.  may be applicable.
     . PacketConn
 
 
+
+    
 
 ----------------------------------
 : Structures / Types / Files
@@ -80,10 +154,12 @@ other notes on client api:
     . switch.load_from_file     // load previous
 
 
-// Switch provides an api to applications using the library
+// Switch provides a client api to applications using the library
 . switch(s)
 
 
+
+//Cipher sets produce keys and parts, but also...
 . cipher_sets
     . interface for CipherSet
         . generate()
