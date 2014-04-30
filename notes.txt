@@ -68,7 +68,7 @@ encryption.  The encryption used is based on the best common cipher set
 supported by each switch instance.
 
 
-* Line Packets / Telehash Packets (Outer Packets)
+* Line Packets (Outer Packets)
 Line packets contain a head and a body.  The body is often a channel packet
 wrapped in an additional layer of encryption.  Line packets wrap and transmit
 these channel packets over a network transport.
