@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/codycollier/thermal/thermal"
+	"github.com/codycollier/thermal"
 	"time"
 )
 
