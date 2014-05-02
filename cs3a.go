@@ -1,15 +1,28 @@
 package thermal
 
 import (
-//"code.google.com/p/go.crypto/nacl/box"
-//"code.google.com/p/go.crypto/nacl/secretbox"
-//"crypto/rand"
-//"crypto/sha256"
+	//"code.google.com/p/go.crypto/nacl/secretbox"
+	"code.google.com/p/go.crypto/nacl/box"
+	"crypto/rand"
+	"crypto/sha256"
+	"fmt"
 )
 
 type cs3a cipherSetPlugin
 
 func (cs *cs3a) init() {
-	cs.id = "cs3a"
 
+	pubkey, prvkey, err := box.GenerateKey(rand.Reader)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+	}
+
+	hash256 := sha256.New()
+	hash256.Write(pubkey[:])
+	fingerprint := hash256.Sum(nil)
+
+	cs.id = "cs3a"
+	cs.fingerprint = fingerprint
+	cs.public_key = *pubkey
+	cs.private_key = *prvkey
 }

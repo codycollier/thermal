@@ -11,5 +11,5 @@ func (*Switch) Init() {
 	fmt.Printf("Initializing switch\n")
 	cstest := new(cs3a)
 	cstest.init()
-	fmt.Printf("cstest: %s\n", cstest)
+	fmt.Printf("cs3a fingerprint: %x\n", cstest.fingerprint)
 }

@@ -3,7 +3,7 @@ package thermal
 // cipherSetPlugin is the base type for all cipher set types
 type cipherSetPlugin struct {
 	id          string
-	fingerprint string
+	fingerprint []byte
 	private_key [32]byte
 	public_key  [32]byte
 }
