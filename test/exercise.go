@@ -1,19 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"github.com/codycollier/thermal"
+	"log"
 	"time"
 )
 
 // exercise will exercise and test the thermal library
 func exercise() {
+	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	start := time.Now()
-	fmt.Printf("start: %s\n", start)
+	log.Println("starting")
 	s := new(thermal.Switch)
 	s.Init()
-	fmt.Printf("Switch instance created: %s\n", *s)
-	fmt.Printf("stop: %s\n", time.Now())
+	log.Printf("Switch instance created: %s\n", *s)
+	log.Println("finished")
+	log.Printf("duration: %s\n", time.Since(start))
 }
 
 func main() {

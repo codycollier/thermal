@@ -5,7 +5,7 @@ import (
 	"code.google.com/p/go.crypto/nacl/box"
 	"crypto/rand"
 	"crypto/sha256"
-	"fmt"
+	"log"
 )
 
 type cs3a cipherSetPlugin
@@ -14,7 +14,7 @@ func (cs *cs3a) init() {
 
 	pubkey, prvkey, err := box.GenerateKey(rand.Reader)
 	if err != nil {
-		fmt.Printf("Error: %s\n", err)
+		log.Printf("Error: %s\n", err)
 	}
 
 	hash256 := sha256.New()
