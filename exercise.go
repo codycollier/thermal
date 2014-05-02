@@ -11,6 +11,7 @@ func exercise() {
 	start := time.Now()
 	fmt.Printf("start: %s\n", start)
 	s := new(thermal.Switch)
+	s.Init()
 	fmt.Printf("Switch instance created: %s\n", *s)
 	fmt.Printf("stop: %s\n", time.Now())
 }
