@@ -16,7 +16,7 @@ func (*Switch) Init() {
 	// setup the cipher sets
 	cpack := make(cipherPack)
 
-	//cpack["cs1a"] = new(cs1a)
+	cpack["cs2a"] = new(cs2a)
 	cpack["cs3a"] = new(cs3a)
 
 	for csid, cset := range cpack {
@@ -24,10 +24,10 @@ func (*Switch) Init() {
 		cset.init()
 
 		id := cset.csid()
-		log.Printf("csid: %s (%s)\n", id, csid)
+		log.Printf(" csid: %s :: %s\n", id, csid)
 
 		id, fingerprint := cset.parts()
-		log.Printf("parts: %s :: %x\n", id, fingerprint)
+		log.Printf("parts: %s :: %s\n", id, fingerprint)
 
 	}
 
