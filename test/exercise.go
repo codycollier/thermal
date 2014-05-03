@@ -11,14 +11,13 @@ func exercise() {
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 
 	start := time.Now()
-	log.Println("starting")
+	log.Println("Starting exercise")
 
 	s := new(thermal.Switch)
 	s.Init()
 	log.Printf("Switch instance created: %s\n", *s)
 
-	log.Println("finished")
-	log.Printf("duration: %s\n", time.Since(start))
+	log.Printf("Finished exercise (%s)\n", time.Since(start))
 }
 
 func main() {

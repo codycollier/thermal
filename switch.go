@@ -11,9 +11,10 @@ func (*Switch) Init() {
 
 	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
-	log.Printf("Initializing switch\n")
+	log.Println("Starting initialization of switch")
 
 	// setup the cipher sets
+	log.Println("Starting initialization of cipher sets")
 	cpack := make(cipherPack)
 
 	cpack["cs2a"] = new(cs2a)
@@ -30,5 +31,10 @@ func (*Switch) Init() {
 		log.Printf("parts: %s :: %s\n", id, fingerprint)
 
 	}
+	log.Println("Finished initialization of cipher sets")
+
+	//
+	log.Println("Finished initialization of switch")
+	log.Println("Switch ready")
 
 }
