@@ -13,8 +13,8 @@ import (
 type cs3a struct {
 	id          string
 	fingerprint []byte
-	private_key [32]byte
-	public_key  [32]byte
+	privateKey  [32]byte
+	publicKey   [32]byte
 }
 
 // init will initialize an empty cs3a
@@ -31,8 +31,8 @@ func (cs *cs3a) init() {
 
 	cs.id = "cs3a"
 	cs.fingerprint = fingerprint
-	cs.public_key = *pubkey
-	cs.private_key = *prvkey
+	cs.publicKey = *pubkey
+	cs.privateKey = *prvkey
 
 }
 
