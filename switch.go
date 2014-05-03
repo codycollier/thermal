@@ -8,11 +8,27 @@ import (
 type Switch struct{}
 
 func (*Switch) Init() {
+
+	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	log.Printf("Initializing switch\n")
 
-	cstest := new(cs3a)
-	cstest.init()
+	// setup the cipher sets
+	cpack := make(cipherPack)
 
-	log.Printf("cs3a fingerprint: %x\n", cstest.fingerprint)
+	//cpack["cs1a"] = new(cs1a)
+	cpack["cs3a"] = new(cs3a)
+
+	for csid, cset := range cpack {
+
+		cset.init()
+
+		id := cset.csid()
+		log.Printf("csid: %s (%s)\n", id, csid)
+
+		id, fingerprint := cset.parts()
+		log.Printf("parts: %s :: %x\n", id, fingerprint)
+
+	}
+
 }
