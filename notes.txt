@@ -15,6 +15,28 @@ next items:
 . building a line?
 
 
+----------------------------------------------------------------------------
+::::: snapshot
+----------------------------------------------------------------------------
+
+[rain test]$go run ./exercise.go
+2014/05/03 15:10:16.023357 Starting exercise
+2014/05/03 15:10:16.023569 Starting initialization of switch
+2014/05/03 15:10:16.023576 Starting initialization of cipher sets
+2014/05/03 15:10:16.023613 init cs2a...
+2014/05/03 15:10:17.426711        csid: cs2a
+2014/05/03 15:10:17.426735 fingerprint: c636365adf474657744cdc50a5e8dabea447f95b79bc07bf6214dc814617d2ae
+2014/05/03 15:10:17.426745 init cs3a...
+2014/05/03 15:10:17.426919        csid: cs3a
+2014/05/03 15:10:17.426927 fingerprint: 7561fc0c2430551171f8926c4b87ec49631937baa02debdf70ed11d795fb4fec
+2014/05/03 15:10:17.426934 Finished initialization of cipher sets
+2014/05/03 15:10:17.426940 Finished initialization of switch
+2014/05/03 15:10:17.426945 Switch ready
+2014/05/03 15:10:17.426972 Switch instance created: {}
+2014/05/03 15:10:17.426983 Finished exercise (1.403659479s)
+
+
+
 
 ----------------------------------------------------------------------------
 ::::: reference
