@@ -2,6 +2,19 @@
 :::::::::::> notes
 --------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------
+::::: todo
+----------------------------------------------------------------------------
+
+
+next items:
+. add hashname generation
+. start cs3a_test.go
+. start cipher_sets_test.go
+. start switch_test.go
+. building a line?
+
+
 
 ----------------------------------------------------------------------------
 ::::: reference
@@ -10,21 +23,27 @@ starting point:
 protocol (v2.1-pre)
 . https://github.com/telehash/telehash.org/blob/master/protocol.md
 
+
 go / workspace / project layout references:
 . http://golang.org/doc/code.html#Organization
 . https://code.google.com/p/go-wiki/wiki/GithubCodeLayout
 
-cipher sets
+
+cipher sets and golang
 - cs1a
+    . not sure there is go implementation for ECC secp160r1
 - cs2a
+    https://godoc.org/code.google.com/p/go.crypto/rsa
+    https://godoc.org/code.google.com/p/go.crypto/x509
+    ...
 - cs3a:
-https://godoc.org/code.google.com/p/go.crypto/nacl/box          // key pair
-https://godoc.org/code.google.com/p/go.crypto/nacl/secretbox    // line
+    https://godoc.org/code.google.com/p/go.crypto/nacl/box          // key pair
+    https://godoc.org/code.google.com/p/go.crypto/nacl/secretbox    // line
 
 
 
 ----------------------------------------------------------------------------
-::::: design
+::::: early design notes
 ----------------------------------------------------------------------------
 
 
@@ -141,10 +160,9 @@ other notes on client api:
 
 
 
-    
-
 ----------------------------------
-: Structures / Types / Files
+: scratch notes on structures,
+: types, files, etc
 ----------------------------------
 
 // local exerciser to help with testing
@@ -156,7 +174,6 @@ other notes on client api:
 
 // Switch provides a client api to applications using the library
 . switch(s)
-
 
 
 //Cipher sets produce keys and parts, but also...
@@ -184,8 +201,6 @@ other notes on client api:
 . packet(s)
 . line(s)
 . channel(s)
-
-
 
 
 
