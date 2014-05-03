@@ -22,13 +22,12 @@ func (*Switch) Init() {
 
 	for csid, cset := range cpack {
 
-		log.Printf("Running init for %s\n", csid)
+		log.Printf("init %s...\n", csid)
 		cset.init()
 
-		log.Printf(" csid: %s\n", cset.csid())
-
-		id, fingerprint := cset.parts()
-		log.Printf("parts: %s :: %s\n", id, fingerprint)
+		id, fingerprint := cset.fingerprint()
+		log.Printf("       csid: %s\n", id)
+		log.Printf("fingerprint: %s\n", fingerprint)
 
 	}
 	log.Println("Finished initialization of cipher sets")

@@ -14,11 +14,12 @@ import (
 
 // cs2a is an implementation of the cipher set 2a
 type cs2a struct {
-	id          string
-	fingerprint string
-	publicKey   []byte
-	privateKey  rsa.PrivateKey
-	certificate x509.Certificate
+	id             string
+	fingerprintBin []byte
+	fingerprintHex string
+	publicKey      []byte
+	privateKey     rsa.PrivateKey
+	certificate    x509.Certificate
 }
 
 // init will generate a key pair and initialize the cipher set
@@ -49,12 +50,13 @@ func (cs *cs2a) init() {
 	// generate the fingerprint hash
 	hash256 := sha256.New()
 	hash256.Write(publicKey[:])
-	fingerprint_bytes := hash256.Sum(nil)
-	fingerprint_hex := fmt.Sprintf("%x", fingerprint_bytes)
+	fingerprintBin := hash256.Sum(nil)
+	fingerprintHex := fmt.Sprintf("%x", fingerprintBin)
 
 	// initialize the struct
 	cs.id = "cs2a"
-	cs.fingerprint = fingerprint_hex
+	cs.fingerprintBin = fingerprintBin
+	cs.fingerprintHex = fingerprintHex
 	cs.publicKey = publicKey
 	cs.privateKey = *rsaPrivateKey
 	cs.certificate = *cert
@@ -70,9 +72,9 @@ func (cs *cs2a) csid() string {
 	return cs.id
 }
 
-// parts will return the telehash defined 'parts' for the cipherset
-func (cs *cs2a) parts() (string, string) {
-	return cs.id, cs.fingerprint
+// fingerprint will return the csid and fingerprint for use in a 'parts' set
+func (cs *cs2a) fingerprint() (string, string) {
+	return cs.id, cs.fingerprintHex
 }
 
 // Generate a template x509 certificate

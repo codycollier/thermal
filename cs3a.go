@@ -11,10 +11,11 @@ import (
 
 // cs3a is an implementation of the NaCl based cipher set 3a
 type cs3a struct {
-	id          string
-	fingerprint string
-	publicKey   [32]byte
-	privateKey  [32]byte
+	id             string
+	fingerprintBin []byte
+	fingerprintHex string
+	publicKey      [32]byte
+	privateKey     [32]byte
 }
 
 // init will generate a key pair and initialize the cipher set
@@ -30,12 +31,13 @@ func (cs *cs3a) init() {
 	// generate the fingerprint hash
 	hash256 := sha256.New()
 	hash256.Write(publicKey[:])
-	fingerprintBytes := hash256.Sum(nil)
-	fingerprintHex := fmt.Sprintf("%x", fingerprintBytes)
+	fingerprintBin := hash256.Sum(nil)
+	fingerprintHex := fmt.Sprintf("%x", fingerprintBin)
 
 	// initialize the struct
 	cs.id = "cs3a"
-	cs.fingerprint = fingerprintHex
+	cs.fingerprintBin = fingerprintBin
+	cs.fingerprintHex = fingerprintHex
 	cs.publicKey = *publicKey
 	cs.privateKey = *privateKey
 
@@ -50,7 +52,7 @@ func (cs *cs3a) csid() string {
 	return cs.id
 }
 
-// parts will return the telehash defined 'parts' for the cipherset
-func (cs *cs3a) parts() (string, string) {
-	return cs.id, cs.fingerprint
+// fingerprint will return the csid and fingerprint for use in a 'parts' set
+func (cs *cs3a) fingerprint() (string, string) {
+	return cs.id, cs.fingerprintHex
 }

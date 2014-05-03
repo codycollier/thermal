@@ -4,7 +4,7 @@ package thermal
 type cipherSet interface {
 	init()
 	csid() string
-	parts() (string, string)
+	fingerprint() (string, string)
 }
 
 // A cipherPack holds a group of cipher sets
