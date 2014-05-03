@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-// Swith provides an api to create, manage, and use a Telehash switch instance
+// Switch provides an api to create, manage, and use a Telehash switch instance
 type Switch struct{}
 
 func (*Switch) Init() {
