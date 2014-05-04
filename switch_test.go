@@ -7,6 +7,11 @@ import (
 )
 
 func TestSwitchInit(t *testing.T) {
+
+	if testing.Short() {
+		t.Skip("skipping switch init test in short mode")
+	}
+
 	log.SetOutput(ioutil.Discard)
 	s := new(Switch)
 	err := s.Init()
