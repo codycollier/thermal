@@ -30,31 +30,51 @@ func TestHashnameGenerationBoundaries(t *testing.T) {
 }
 
 func TestPartsExtraction(t *testing.T) {
+
 	testCPack := make(cipherPack)
 	cset := new(cs3a)
 	cset.init()
 	testCPack["cs3a"] = cset
-	extractParts(&testCPack)
+
+	testparts, err := extractParts(&testCPack)
+
+	// there should be no error
+	if err != nil {
+		t.Fail()
+	}
+
+	// there should be one entry per cipherSet
+	if len(testparts) != 1 {
+		t.Fail()
+	}
+
+	// the entry value should be a 64 len hex string
+	if len(testparts["cs3a"]) != 64 {
+		t.Logf("Bad fingerprint - testparts[cs3a]: %s", testparts["cs3a"])
+		t.Fail()
+	}
 
 }
 
 func TestPartsExtractionBounraries(t *testing.T) {
 
-	var testparts map[string]string
+	var err error
 
-	// totally empty cpack
+	// empty cpack should result in empty parts
 	emptyCPack := make(cipherPack)
-	testparts = extractParts(&emptyCPack)
-	if len(testparts) != 0 {
+	_, err = extractParts(&emptyCPack)
+	if err == nil {
+		t.Log("extractParts should return error for empty cpack")
 		t.Fail()
 	}
 
-	// cpack with a non-initialized cipherSet
+	// only non-initialized cipherSets should also result in empty parts
 	noinitCPack := make(cipherPack)
 	cset := new(cs3a)
 	noinitCPack["cs3a"] = cset
-	extractParts(&noinitCPack)
-	if len(testparts) != 0 {
+	_, err = extractParts(&noinitCPack)
+	if err == nil {
+		t.Log("extractParts should return error if it finds non-init cset")
 		t.Fail()
 	}
 

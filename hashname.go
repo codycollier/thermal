@@ -7,16 +7,25 @@ import (
 )
 
 // extractParts will pull out the hashname parts from a cipherPack
-func extractParts(cpack *cipherPack) map[string]string {
+func extractParts(cpack *cipherPack) (map[string]string, error) {
+
+	if len(*cpack) == 0 {
+		return nil, fmt.Errorf("cipherPack is empty")
+	}
 
 	parts := make(map[string]string)
 
 	for _, cset := range *cpack {
 		csid, fingerprint := cset.fingerprint()
+
+		if fingerprint == "" {
+			return nil, fmt.Errorf("fingerprint for %s is empty", csid)
+		}
+
 		parts[csid] = fingerprint
 	}
 
-	return parts
+	return parts, nil
 }
 
 // generateHashname will create a switch hashname from the given parts
