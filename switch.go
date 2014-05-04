@@ -5,9 +5,11 @@ import (
 )
 
 // Switch provides an api to create, manage, and use a Telehash switch instance
-type Switch struct{}
+type Switch struct {
+	hashname string
+}
 
-func (*Switch) Init() {
+func (s *Switch) Init() error {
 
 	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
@@ -15,17 +17,19 @@ func (*Switch) Init() {
 
 	// setup the cipher sets
 	log.Println("Starting initialization of cipher sets")
-	cpack := make(cipherPack)
 
+	cpack := make(cipherPack)
 	cpack["cs2a"] = new(cs2a)
 	cpack["cs3a"] = new(cs3a)
 
 	for csid, cset := range cpack {
 
 		log.Printf("init %s...\n", csid)
+
 		err := cset.init()
 		if err != nil {
 			log.Printf("Error in initialization of cset. csid:%s  err: %s", csid, err)
+			return err
 		}
 
 		id, fingerprint := cset.fingerprint()
@@ -35,8 +39,23 @@ func (*Switch) Init() {
 	}
 	log.Println("Finished initialization of cipher sets")
 
-	//
+	// build the hashname for the switch instance
+	log.Println("Starting hashname creation")
+	parts, err := extractParts(&cpack)
+	if err != nil {
+		return err
+	}
+	hashname, err := generateHashname(parts)
+	if err != nil {
+		return err
+	}
+	s.hashname = hashname
+	log.Printf("switch hashname: %s", s.hashname)
+	log.Println("Finished hashname creation")
+
+	// end
 	log.Println("Finished initialization of switch")
 	log.Println("Switch ready")
+	return nil
 
 }
