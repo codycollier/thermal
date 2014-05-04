@@ -5,12 +5,18 @@ import (
 )
 
 func TestHashingAccuracy(t *testing.T) {
+
+	// known good parts and hashname taken from telehash docs
 	knownParts := map[string]string{
 		"2a": "bf6e23c6db99ed2d24b160e89a37c9cd183fb61afeca40c4bc378cf6e488bebe",
 		"1a": "a5a741fa09b05baaead17fa9932e13cdafc7bcd39db1153fc6bbfe4614c063f3",
 	}
 	knownHash := "0b0137a6b38d00780686207b6f4b19e8731e68c6f76b435c85faf77100851451"
-	testHash := generateHashname(knownParts)
+
+	testHash, err := generateHashname(knownParts)
+	if err != nil {
+		t.Fail()
+	}
 	if knownHash != testHash {
 		t.Logf("knownHash: %s\n", knownHash)
 		t.Logf(" testHash: %s\n", testHash)
@@ -21,10 +27,11 @@ func TestHashingAccuracy(t *testing.T) {
 
 func TestHashnameGenerationBoundaries(t *testing.T) {
 
-	// ensure empty parts results in an empty hash
+	// ensure empty parts causes error
 	emptyParts := map[string]string{}
-	testHash := generateHashname(emptyParts)
-	if testHash != "" {
+	_, err := generateHashname(emptyParts)
+	if err == nil {
+		t.Log("Empty parts should force error in generateHashname")
 		t.Fail()
 	}
 }
@@ -59,20 +66,38 @@ func TestPartsExtraction(t *testing.T) {
 func TestPartsExtractionBounraries(t *testing.T) {
 
 	var err error
+	var cset cipherSet
+	var cpack cipherPack
 
-	// empty cpack should result in empty parts
-	emptyCPack := make(cipherPack)
-	_, err = extractParts(&emptyCPack)
+	// empty cpack should result in error
+	cpack = make(cipherPack)
+	_, err = extractParts(&cpack)
 	if err == nil {
 		t.Log("extractParts should return error for empty cpack")
 		t.Fail()
 	}
 
-	// only non-initialized cipherSets should also result in empty parts
-	noinitCPack := make(cipherPack)
-	cset := new(cs3a)
-	noinitCPack["cs3a"] = cset
-	_, err = extractParts(&noinitCPack)
+	// single non-initialized cipherSet should result in error
+	cpack = make(cipherPack)
+	cset = new(cs3a)
+	cpack["cs3a"] = cset
+	_, err = extractParts(&cpack)
+	if err == nil {
+		t.Log("extractParts should return error if it finds non-init cset")
+		t.Fail()
+	}
+
+	// any non-initialized cipherSet should result in error
+	cpack = make(cipherPack)
+
+	cset = new(cs3a)
+	cset.init()
+	cpack["cs3a"] = cset
+
+	cset = new(cs2a)
+	cpack["cs2a"] = cset
+
+	_, err = extractParts(&cpack)
 	if err == nil {
 		t.Log("extractParts should return error if it finds non-init cset")
 		t.Fail()

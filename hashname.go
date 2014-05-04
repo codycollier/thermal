@@ -29,7 +29,11 @@ func extractParts(cpack *cipherPack) (map[string]string, error) {
 }
 
 // generateHashname will create a switch hashname from the given parts
-func generateHashname(parts map[string]string) string {
+func generateHashname(parts map[string]string) (string, error) {
+
+	if len(parts) == 0 {
+		return "", fmt.Errorf("parts map is empty")
+	}
 
 	var keys []string
 	rollup := make([]byte, 0)
@@ -58,5 +62,5 @@ func generateHashname(parts map[string]string) string {
 	hashnameBin := rollup
 	hashnameHex := fmt.Sprintf("%x", hashnameBin)
 
-	return hashnameHex
+	return hashnameHex, nil
 }
