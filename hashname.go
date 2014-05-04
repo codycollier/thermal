@@ -36,13 +36,13 @@ func generateHashname(parts map[string]string) string {
 	for _, csid := range keys {
 
 		hash.Reset()
-		hash.Write([]byte(csid))
-		rollup = hash.Sum(rollup)
+		hash.Write(append(rollup, []byte(csid)...))
+		rollup = hash.Sum(nil)
 
-		fingerprint := parts[csid]
 		hash.Reset()
-		hash.Write([]byte(fingerprint))
-		rollup = hash.Sum(rollup)
+		fingerprint := parts[csid]
+		hash.Write(append(rollup, []byte(fingerprint)...))
+		rollup = hash.Sum(nil)
 
 	}
 
