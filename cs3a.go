@@ -19,13 +19,13 @@ type cs3a struct {
 }
 
 // init will generate a key pair and initialize the cipher set
-func (cs *cs3a) init() {
+func (cs *cs3a) init() error {
 
 	// generate the key pair
 	publicKey, privateKey, err := box.GenerateKey(rand.Reader)
 	if err != nil {
 		log.Println("Error generating NaCl keypair in cs3a initialization")
-		log.Panicf("Error: %s\n", err)
+		return err
 	}
 
 	// generate the fingerprint hash
@@ -40,6 +40,8 @@ func (cs *cs3a) init() {
 	cs.fingerprintHex = fingerprintHex
 	cs.publicKey = *publicKey
 	cs.privateKey = *privateKey
+
+	return nil
 
 }
 

@@ -23,7 +23,10 @@ func (*Switch) Init() {
 	for csid, cset := range cpack {
 
 		log.Printf("init %s...\n", csid)
-		cset.init()
+		err := cset.init()
+		if err != nil {
+			log.Printf("Error in initialization of cset. csid:%s  err: %s", csid, err)
+		}
 
 		id, fingerprint := cset.fingerprint()
 		log.Printf("       csid: %s\n", id)

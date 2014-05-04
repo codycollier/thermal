@@ -2,7 +2,7 @@ package thermal
 
 // The cipherSet interface defines behavior expected from a cipher set plugin
 type cipherSet interface {
-	init()
+	init() error
 	csid() string
 	fingerprint() (string, string)
 }

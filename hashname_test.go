@@ -57,7 +57,7 @@ func TestPartsExtraction(t *testing.T) {
 
 	// the entry value should be a 64 len hex string
 	if len(testparts["cs3a"]) != 64 {
-		t.Logf("Bad fingerprint - testparts[cs3a]: %s", testparts["cs3a"])
+		t.Logf("Bad fingerprint - testparts[cs3a]: %s\n", testparts["cs3a"])
 		t.Fail()
 	}
 

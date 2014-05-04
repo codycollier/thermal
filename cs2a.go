@@ -23,13 +23,13 @@ type cs2a struct {
 }
 
 // init will generate a key pair and initialize the cipher set
-func (cs *cs2a) init() {
+func (cs *cs2a) init() error {
 
 	// generate the rsa-2048 key pair
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		log.Println("Error generating rsa keypair in cs2a initialization")
-		log.Panicf("Error: %s\n", err)
+		return err
 	}
 	rsaPublicKey := &rsaPrivateKey.PublicKey
 
@@ -60,6 +60,8 @@ func (cs *cs2a) init() {
 	cs.publicKey = publicKey
 	cs.privateKey = *rsaPrivateKey
 	cs.certificate = *cert
+
+	return nil
 
 }
 
