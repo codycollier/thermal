@@ -8,10 +8,6 @@
 
 
 next items:
-. add hashname generation
-. start cs3a_test.go
-. start cipher_sets_test.go
-. start switch_test.go
 . building a line?
 
 
@@ -20,20 +16,23 @@ next items:
 ----------------------------------------------------------------------------
 
 [rain test]$go run ./exercise.go
-2014/05/03 15:10:16.023357 Starting exercise
-2014/05/03 15:10:16.023569 Starting initialization of switch
-2014/05/03 15:10:16.023576 Starting initialization of cipher sets
-2014/05/03 15:10:16.023613 init cs2a...
-2014/05/03 15:10:17.426711        csid: cs2a
-2014/05/03 15:10:17.426735 fingerprint: c636365adf474657744cdc50a5e8dabea447f95b79bc07bf6214dc814617d2ae
-2014/05/03 15:10:17.426745 init cs3a...
-2014/05/03 15:10:17.426919        csid: cs3a
-2014/05/03 15:10:17.426927 fingerprint: 7561fc0c2430551171f8926c4b87ec49631937baa02debdf70ed11d795fb4fec
-2014/05/03 15:10:17.426934 Finished initialization of cipher sets
-2014/05/03 15:10:17.426940 Finished initialization of switch
-2014/05/03 15:10:17.426945 Switch ready
-2014/05/03 15:10:17.426972 Switch instance created: {}
-2014/05/03 15:10:17.426983 Finished exercise (1.403659479s)
+2014/05/04 15:20:41.870071 Starting exercise
+2014/05/04 15:20:41.870263 Starting initialization of switch
+2014/05/04 15:20:41.870270 Starting initialization of cipher sets
+2014/05/04 15:20:41.870310 init cs2a...
+2014/05/04 15:20:43.078745        csid: cs2a
+2014/05/04 15:20:43.078774 fingerprint: 5a94f43fb6076add699f001db67604916d5a0adabf06a0125f177417b078bc39
+2014/05/04 15:20:43.078783 init cs3a...
+2014/05/04 15:20:43.078976        csid: cs3a
+2014/05/04 15:20:43.078986 fingerprint: 913b9c437c7cfad9e16b569c2fb17292f7760269eebb197c5f48d74fddc90fae
+2014/05/04 15:20:43.078993 Finished initialization of cipher sets
+2014/05/04 15:20:43.078999 Starting hashname creation
+2014/05/04 15:20:43.079033 switch hashname: f0ba6cb61921702ae646c7e487450036a0e21f5ac9398bd4bb8af98026900966
+2014/05/04 15:20:43.079106 Finished hashname creation
+2014/05/04 15:20:43.079116 Finished initialization of switch
+2014/05/04 15:20:43.079122 Switch ready
+2014/05/04 15:20:43.079164 Switch instance created: {f0ba6cb61921702ae646c7e487450036a0e21f5ac9398bd4bb8af98026900966}
+2014/05/04 15:20:43.079178 Finished exercise (1.209129485s)
 
 
 
