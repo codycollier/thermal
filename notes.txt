@@ -9,6 +9,8 @@
 next items:
 . loading seeds
 . saving hashname
+. packet parsing
+. switching logic
 . building a line
 
 
@@ -181,24 +183,28 @@ other notes on client api:
     . PacketConn
 
 
-
 ----------------------------------
 : scratch notes on structures,
 : types, files, etc
 ----------------------------------
 
+These are just scratch notes and will not match final code design.
+
 // local exerciser to help with testing
 ./exercise.go
     . switch
-    . switch.init               // creates cipher sets and hashname
-    . switch.load_from_file     // load previous
+    . switch.init
+    . ping?
 
 
 // Switch provides a client api to applications using the library
 . switch(s)
+    . switch.init               // creates cipher sets and hashname
+    . switch.load_from_file     // load previous
 
 
-//Cipher sets produce keys and parts, but also...
+// Cipher sets produce keys and fingerprints
+// Cipher sets also...
 . cipher_sets
     . interface for CipherSet
         . generate()
@@ -224,6 +230,40 @@ other notes on client api:
 . line(s)
 . channel(s)
 
+
+----------------------------------
+: switching logic
+----------------------------------
+
+::  inbound - request   (A request/session initiated by remote node)
+::  inbound - response  (A response from a remote node
+::  inbound - relay
+:: outbound - request   (A request/session to a remote node, initiated by self)
+:: outbound - response  (A response to a remote node)
+:: outbound - relay
+
+
+:: inbound - request
+. transport packet in on listener
+. extract telehash packet from transport
+    . udp?  simple 1:1
+    . http?  unwrap from inside body of requests etc
+. parse telehash outer packet (length, head, body)
+    . switch {
+
+        head-length == 1: line open packet
+            head.1 is csid
+            body.all is encrypted open request
+            decrypt body to channel packet
+
+        head-length == 0: line data packet 
+            body.16 is line id
+            match line id or drop
+            body.rest is encrypted channel packet
+            decrypt body to channel packet
+
+        default:
+            drop
 
 
 
