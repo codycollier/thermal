@@ -243,18 +243,21 @@ These are just scratch notes and will not match final code design.
 :: outbound - relay
 
 
+-------------------------
 :: inbound - request
+-------------------------
 . transport packet in on listener
-. extract telehash packet from transport
+    . extract telehash packet from transport
     . udp?  simple 1:1
     . http?  unwrap from inside body of requests etc
+
 . parse telehash outer packet (length, head, body)
     . switch {
 
         head-length == 1: line open packet
             head.1 is csid
             body.all is encrypted open request
-            decrypt body to channel packet
+            decrypt body to open request
 
         head-length == 0: line data packet 
             body.16 is line id
@@ -264,6 +267,37 @@ These are just scratch notes and will not match final code design.
 
         default:
             drop
+
+. parse telehash inner packet (length, head, body)
+
+    . switch {
+
+        type: line-open
+            head is json (to, from, line, at)
+            body is sender's public key (binary)
+            
+            
+
+        type: line-data
+
+imp: interface message processor
+the first switch/router devices on the arpanet
+            
+-------------------------
+:: open handshake
+-------------------------
+
+sorting out the steps by reading the docs (cs3a)
+
+
+. cipher set initialization at switch initialization
+    . generate/use an instance level key pair (box.GenerateKey(rand.Reader))
+
+. open request (cs3a)
+    . generate a new key pair (box.GenerateKey(rand.Reader))
+    . generate a line id
+    . 
+
 
 
 
