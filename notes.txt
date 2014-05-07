@@ -54,15 +54,26 @@ go / workspace / project layout references:
 
 
 cipher sets and golang
+
 - cs1a
-    . not sure there is go implementation for ECC secp160r1
+    . not sure there is a go implementation for ECC secp160r1
+
 - cs2a
     https://godoc.org/code.google.com/p/go.crypto/rsa
     https://godoc.org/code.google.com/p/go.crypto/x509
     ...
+
 - cs3a:
-    https://godoc.org/code.google.com/p/go.crypto/nacl/box          // key pair
+    For box and secretbox:
+    https://godoc.org/code.google.com/p/go.crypto/nacl/box          // switch key pair
     https://godoc.org/code.google.com/p/go.crypto/nacl/secretbox    // line
+
+    For onetimeauth, the nacl docs say that poly1305 is used, so
+    look here for onetimeauth:
+    https://godoc.org/code.google.com/p/go.crypto/poly1305
+    This is the same thing used in crypto_secretbox.
+
+    If the above will work, all the pieces for cs3a should be available.
 
 
 
