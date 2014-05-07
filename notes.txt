@@ -268,6 +268,8 @@ These are just scratch notes and will not match final code design.
         default:
             drop
 
+    }
+
 . parse telehash inner packet (length, head, body)
 
     . switch {
@@ -279,9 +281,19 @@ These are just scratch notes and will not match final code design.
             
 
         type: line-data
+    }
+
+    . ...work in progress
+
+
+
+
+--------------------------------------------------
+fun fact
 
 imp: interface message processor
 the first switch/router devices on the arpanet
+--------------------------------------------------
 
  
 -------------------------
@@ -290,7 +302,6 @@ the first switch/router devices on the arpanet
 
 sorting out the steps by reading the docs (cs3a)
 
-
 . cipher set initialization at switch initialization
     . generate/use an instance level key pair (box.GenerateKey(rand.Reader))
 
@@ -298,9 +309,10 @@ sorting out the steps by reading the docs (cs3a)
     . generate a line id (16 random bytes lower case hex encoded)
     . generate a new key pair (crypto_box) (box.GenerateKey(rand.Reader))
     . generate a nonce
-    . precompute the 'agreedKey' -- learn why it's named this
+    . precompute the 'agreedKey' (shared secret)
     . build the inner packet (json (to, from, parts, at) + switch public key)
     . encrypt the inner packet using crypto_secretbox
+    . ...work in progress
 
 
 
