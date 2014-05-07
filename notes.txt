@@ -282,7 +282,8 @@ These are just scratch notes and will not match final code design.
 
 imp: interface message processor
 the first switch/router devices on the arpanet
-            
+
+ 
 -------------------------
 :: open handshake
 -------------------------
@@ -294,9 +295,12 @@ sorting out the steps by reading the docs (cs3a)
     . generate/use an instance level key pair (box.GenerateKey(rand.Reader))
 
 . open request (cs3a)
-    . generate a new key pair (box.GenerateKey(rand.Reader))
-    . generate a line id
-    . 
+    . generate a line id (16 random bytes lower case hex encoded)
+    . generate a new key pair (crypto_box) (box.GenerateKey(rand.Reader))
+    . generate a nonce
+    . precompute the 'agreedKey' -- learn why it's named this
+    . build the inner packet (json (to, from, parts, at) + switch public key)
+    . encrypt the inner packet using crypto_secretbox
 
 
 
