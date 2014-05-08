@@ -311,20 +311,55 @@ the first switch/router devices on the arpanet
 :: open handshake
 -------------------------
 
-sorting out the steps by reading the docs (cs3a)
+sorting out the steps
+
 
 . cipher set initialization at switch initialization
     . generate/use an instance level key pair (box.GenerateKey(rand.Reader))
 
-. open request (cs3a)
-    . generate a line id (16 random bytes lower case hex encoded)
-    . generate a new key pair (crypto_box) (box.GenerateKey(rand.Reader))
-    . generate a nonce
-    . precompute the 'agreedKey' (shared secret)
-    . build the inner packet (json (to, from, parts, at) + switch public key)
-    . encrypt the inner packet using crypto_secretbox
-    . ...work in progress
 
+. send: open request (cs3a)
+
+    . generate a line id (16 random bytes lower case hex encoded)
+    . generate a new line level key pair (crypto_box) (box.GenerateKey(rand.Reader))
+
+    . encryption 
+        . build the inner packet (json (to, from, parts, at) + switch public key)
+        . generate a nonce
+        . generate the 'agreedKey' (shared secret)
+        . encrypt the inner packet using crypto_secretbox
+        
+        . prepend the line public key to make the open packet data
+
+    . authentication
+        . generate a macKey
+        . use onetimeauth/poly1305 to generate an HMAC
+        . prepend the hmac to the open packet data
+
+
+. recv: open request (cs3a)
+
+    . unpack the open packet
+
+    . generate a line id (16 random bytes lower case hex encoded)
+    . generate a new line level key pair (crypto_box) (box.GenerateKey(rand.Reader))
+
+    . authentication
+        . retrieve the hmac
+        . generate a macKey
+        . use onetimeauth/poly1305 verify to authenticate the packet
+
+    . decryption 
+        . generate a nonce
+        . generate the 'agreedKey' (shared secret)
+        . decrypt the inner packet using crypto_secretbox_open
+
+
+
+
+-------------------------
+:: line encrypt/decrypt
+-------------------------
 
 
 
