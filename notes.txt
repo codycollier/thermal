@@ -255,62 +255,127 @@ These are just scratch notes and will not match final code design.
 :: outbound - relay
 
 
--------------------------
-:: inbound - request
--------------------------
-. transport packet in on listener
-    . extract telehash packet from transport
-    . udp?  simple 1:1
-    . http?  unwrap from inside body of request etc
-
-. parse outer packet (length, head, body)
-    . switch {
-
-        head-length == 1: line open packet
-
-            csid = head.1 is csid
-            innerEncPacket = body.all (open request)
-
-            valid csid? - ??
-
-            get cipherset for csid from cipherpack
-            decrypt innerEncryptedPacket
-            parse inner packet
-            route inner packet - open
-
-        head-length == 0: line data packet 
-
-            lineID = body.16
-            innerEncPacket = body.rest (channel packet)
-
-            valid lineID? - drop early
-
-            get cipherset for csid from cipherpack
-            decrypt innerEncryptedPacket
-            parse inner packet
-            route inner packet - line
-
-        default:
-            drop
-
-    }
-
-
-. processOpenPacket()
-
-
-. processLinePacket(lineID, encryptedInnerPacket)
-
-
-
-
-
 --------------------------------------------------
 fun fact
 
 imp: interface message processor
 the first switch/router devices on the arpanet
 --------------------------------------------------
+
+
+-------------------------
+:: inbound - request
+-------------------------
+
+---------(step 1)-----------
+transport packet in on listener
+    . extract telehash packet from transport
+    . udp?  simple 1:1
+    . http?  unwrap from inside body of request etc
+
+
+---------(step 2)-----------
+process outer packet (outerPacket)
+    # Decode and Route
+
+    decode-packet(outerPacket)
+        head-length
+        head
+        body
+
+    switch {
+
+        head-length == 1: line open packet
+
+            head-length == 1
+            head.1      == csid
+            body.all    == csdata
+
+            not a valid csid: drop early
+
+            route("open", csid, csdata)
+
+        head-length == 0: line data packet 
+
+            head-length      == 0
+            head             == empty
+            body.00-16       == lineid
+            body.rest        == csData
+
+            not a valid lineID: drop early
+
+            route("line", lineID, csdata)
+
+        default:
+            drop
+
+    }
+
+---------(step 3a)-----------
+processEncryptedOpenPacket(csid, csdata)
+    # Decrypt and Decode
+
+    get cipherset for csid from cipherpack
+    openPacket = cset.decryptOpenPacket(csdata)
+                    # interface / plugin
+                    cs1a:
+                    cs2a:
+                    cs3a:
+                        csdata.00-32  == auth - onetimeauth
+                        csdata.33-64  == line_key - senders line level public key
+                        csdata.rest   == inner_ciphertext (encrypted open packet)
+                        auth and decrypt the inner ciphertext
+
+    decode-packet(openPacket)
+        head-length == 2+
+        head        == open json(to, from, at, line)
+        body.all    == sender switch level public key
+
+    if head-length < 2:  invalid?  drop?
+        
+
+---------(step 3b)-----------
+processEncryptedChannelPacket(lineID, csdata)
+
+    # Decrypt and Decode
+
+    lookup csid for the lineID
+    get cipherset for csid from cipherpack
+    channelPacket = cset.decryptChannelPacket(csdata)
+                        # interface / plugin
+                        cs1a:
+                        cs2a:
+                        cs3a:
+                            csdata.00-24  == onetimeauth
+                            csdata.rest   == inner_ciphertext (encrypted channel packet)
+                            auth and decrypt the inner ciphertext
+
+    decode-packet(channelPacket)
+        head-length == 2+
+        head        == channel json(type, ...)
+        body        == sometimes some channel binary
+
+    if head-length < 2:  invalid?  drop?
+
+    switch {
+        type == seek:
+            channel handler?
+        type == link:
+        type == peer:
+        type == connect:
+        type == bridge:
+        type == path:
+        default:
+            drop
+    }
+
+
+-------------------------
+:: outbound - request
+-------------------------
+
+
+
 
 
  
@@ -357,7 +422,6 @@ the first switch/router devices on the arpanet
         . generate a nonce
         . generate the 'agreedKey' (shared secret)
         . decrypt the inner packet using crypto_secretbox_open
-
 
 
 
