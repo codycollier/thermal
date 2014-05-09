@@ -8,9 +8,11 @@
 
 next items:
 . loading seeds
-. saving hashname
-. packet parsing
+. saving/loading switch state
+
 . switching logic
+. packet parsing
+
 . building a line
 
 
@@ -214,8 +216,7 @@ These are just scratch notes and will not match final code design.
     . switch.load_from_file     // load previous
 
 
-// Cipher sets produce keys and fingerprints
-// Cipher sets also...
+// Cipher sets produce keys, fingerprints, and encryption schemes
 . cipher_sets
     . interface for CipherSet
         . generate()
@@ -260,41 +261,46 @@ These are just scratch notes and will not match final code design.
 . transport packet in on listener
     . extract telehash packet from transport
     . udp?  simple 1:1
-    . http?  unwrap from inside body of requests etc
+    . http?  unwrap from inside body of request etc
 
-. parse telehash outer packet (length, head, body)
+. parse outer packet (length, head, body)
     . switch {
 
         head-length == 1: line open packet
-            head.1 is csid
-            body.all is encrypted open request
-            decrypt body to open request
+
+            csid = head.1 is csid
+            innerEncPacket = body.all (open request)
+
+            valid csid? - ??
+
+            get cipherset for csid from cipherpack
+            decrypt innerEncryptedPacket
+            parse inner packet
+            route inner packet - open
 
         head-length == 0: line data packet 
-            body.16 is line id
-            match line id or drop
-            body.rest is encrypted channel packet
-            decrypt body to channel packet
+
+            lineID = body.16
+            innerEncPacket = body.rest (channel packet)
+
+            valid lineID? - drop early
+
+            get cipherset for csid from cipherpack
+            decrypt innerEncryptedPacket
+            parse inner packet
+            route inner packet - line
 
         default:
             drop
 
     }
 
-. parse telehash inner packet (length, head, body)
 
-    . switch {
+. processOpenPacket()
 
-        type: line-open
-            head is json (to, from, line, at)
-            body is sender's public key (binary)
-            
-            
 
-        type: line-data
-    }
+. processLinePacket(lineID, encryptedInnerPacket)
 
-    . ...work in progress
 
 
 
@@ -306,13 +312,11 @@ imp: interface message processor
 the first switch/router devices on the arpanet
 --------------------------------------------------
 
+
  
 -------------------------
 :: open handshake
 -------------------------
-
-sorting out the steps
-
 
 . cipher set initialization at switch initialization
     . generate/use an instance level key pair (box.GenerateKey(rand.Reader))
