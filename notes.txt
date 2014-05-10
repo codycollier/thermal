@@ -7,13 +7,28 @@
 ----------------------------------------------------------------------------
 
 next items:
+
+IP . switching logic
+IP . packet parsing
+
+. packet
+    . decodePacket
+    . encodePacket
+
+. cs3a/cipherSet interface
+    . makeOpenPacket
+    . processOpenPacket
+    . makeLinePacket
+    . processLinePacket
+
+
+. building a line
+
+
 . loading seeds
 . saving/loading switch state
 
-. switching logic
-. packet parsing
 
-. building a line
 
 
 ----------------------------------------------------------------------------
@@ -350,12 +365,18 @@ processEncryptedChannelPacket(lineID, csdata)
                             csdata.rest   == inner_ciphertext (encrypted channel packet)
                             auth and decrypt the inner ciphertext
 
+
+
     decode-packet(channelPacket)
         head-length == 2+
         head        == channel json(type, ...)
         body        == sometimes some channel binary
 
+
+
     if head-length < 2:  invalid?  drop?
+
+
 
     switch {
         type == seek:
@@ -368,6 +389,8 @@ processEncryptedChannelPacket(lineID, csdata)
         default:
             drop
     }
+
+
 
 
 -------------------------
