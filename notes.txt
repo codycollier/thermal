@@ -2,9 +2,9 @@
 :::::::::::> notes
 --------------------------------------------------------------------------------
 
-----------------------------------------------------------------------------
-::::: todo
-----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+:::::::::  todo  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+--------------------------------------------------------------------------------
 
 next items:
 
@@ -31,9 +31,9 @@ IP . packet parsing
 
 
 
-----------------------------------------------------------------------------
-::::: snapshot
-----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+::::::::::::::  snapshot  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+--------------------------------------------------------------------------------
 
 [rain test]$go run ./exercise.go
 2014/05/04 15:20:41.870071 Starting exercise
@@ -57,9 +57,9 @@ IP . packet parsing
 
 
 
-----------------------------------------------------------------------------
-::::: reference
-----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+:::::::::::::::::::  reference  ::::::::::::::::::::::::::::::::::::::::::::::::
+--------------------------------------------------------------------------------
 starting point: 
 protocol (v2.1-pre)
 . https://github.com/telehash/telehash.org/blob/master/protocol.md
@@ -94,9 +94,9 @@ cipher sets and golang
 
 
 
-----------------------------------------------------------------------------
-::::: early design notes
-----------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+::::::::::::::::::::  early design notes  ::::::::::::::::::::::::::::::::::::::
+--------------------------------------------------------------------------------
 
 
 ----------------------------------
@@ -212,8 +212,7 @@ other notes on client api:
 
 
 ----------------------------------
-: scratch notes on structures,
-: types, files, etc
+: structures, types, files, etc
 ----------------------------------
 
 These are just scratch notes and will not match final code design.
@@ -258,9 +257,13 @@ These are just scratch notes and will not match final code design.
 . channel(s)
 
 
-----------------------------------
-: switching logic
-----------------------------------
+----------------------------------------------------------------------
+:: switching logic
+----------------------------------------------------------------------
+fun fact
+imp: interface message processor
+the first switch/router devices on the arpanet
+
 
 ::  inbound - request   (A request/session initiated by remote node)
 ::  inbound - response  (A response from a remote node
@@ -268,14 +271,6 @@ These are just scratch notes and will not match final code design.
 :: outbound - request   (A request/session to a remote node, initiated by self)
 :: outbound - response  (A response to a remote node)
 :: outbound - relay
-
-
---------------------------------------------------
-fun fact
-
-imp: interface message processor
-the first switch/router devices on the arpanet
---------------------------------------------------
 
 
 -------------------------
@@ -291,6 +286,7 @@ transport packet in on listener
 
 ---------(step 2)-----------
 process outer packet (outerPacket)
+
     # Decode and Route
 
     decode-packet(outerPacket)
@@ -397,13 +393,147 @@ processEncryptedChannelPacket(lineID, csdata)
 :: outbound - request
 -------------------------
 
+---------(step 1)-----------
+channel handlers / systems generate a channel packet
+    . could be a response to an inbound packet
+    . could be an initial packet such as an outbound open request
+
+channel packet is sent to outbound queue 
+
+type == seek:
+type == link:
+type == peer:
+type == connect:
+type == bridge:
+type == path:
+type == new app/custom channel?
+
+
+---------(step 2)-----------
+
+router?
+
+
+---------(step 3a)-----------
+
+#processEncryptedOpenPacket(csid, )
+#processEncryptedOpenPacket(csid, )
+somethingEncryptedOpenPacket(csid, openSomething
+
+    # Encode and Encrypt
+
+    # what is input?  channel aware or not, of lines?
+    # bootstrap problem here?
+
+    lookup lineID for channel
+    lookup csid for the lineID
+
+    openPacket = encode-packet(openSomething)
+                    head-length == len(json) (2+)
+                    head        == open json(to, from, at, line)
+                    body.all    == sender switch level public key
+
+    get cipherset for csid from cipherpack
+
+    csdata = cset.encryptOpenPacket(openPacket)
+                    # interface / plugin
+                    cs1a:
+                    cs2a:
+                    cs3a:
+                        csdata.00-32  == auth - onetimeauth
+                        csdata.33-64  == line_key - senders line level public key
+                        csdata.rest   == inner_ciphertext (encrypted open packet)
+                        auth and decrypt the inner ciphertext
+
+
+---------(step 3b)-----------
+
+somethingEncryptedChannelPacket(channelStuff)
+
+    # Encode and Encrypt
+
+    lookup lineID for channel
+    lookup csid for the lineID
+    get cipherset for csid from cipherpack
+
+    channelPacket = decode-packet(channelStuff)
+                        head-length == len(json) 2+
+                        head        == channel json(type, ...)
+                        body        == sometimes some channel binary
+
+    csdata = cset.decryptChannelPacket(channelPacket)
+                        # interface / plugin
+                        cs1a:
+                        cs2a:
+                        cs3a:
+                            csdata.00-24  == onetimeauth
+                            csdata.rest   == inner_ciphertext (encrypted channel packet)
+                            auth and decrypt the inner ciphertext
 
 
 
+---------(step 4)-----------
+
+make outer packet (csdata, )
+
+    # Encode and ...
+
+    outerPacket = encode-packet(csdata, )
+        head-length
+        head
+        body
+
+        switch {
+
+            head-length == 1: line open packet
+
+                head-length == 1
+                head.1      == csid
+                body.all    == csdata
+
+            head-length == 0: line data packet 
+
+                head-length      == 0
+                head             == empty
+                body.00-16       == lineid
+                body.rest        == csData
+
+                route("line", lineID, csdata)
+
+            default:
+                drop
+
+    match the outer packet / line to a transport target
+    send the packet out over the transport
+
+
+---------(step 5)-----------
+---------(step 5)-----------
+---------(step 5)-----------
+
+
+----------------------------------
+encode
+decode
+process
+generate
+make
+build
+pack
+repack
+unpack
+assemble
+
+
+
+
+----------------------------------------------------------------------
+: channel handling
+----------------------------------------------------------------------
 
  
 -------------------------
-:: open handshake
+: open handshake
 -------------------------
 
 . cipher set initialization at switch initialization
@@ -449,7 +579,7 @@ processEncryptedChannelPacket(lineID, csdata)
 
 
 -------------------------
-:: line encrypt/decrypt
+: line encrypt/decrypt
 -------------------------
 
 
