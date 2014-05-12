@@ -2,7 +2,6 @@ package thermal
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 )
 
@@ -23,10 +22,10 @@ func TestBasicPacketEncodeDecode(t *testing.T) {
 		t.Fail()
 	}
 
-	//fmt.Printf("packet.json: %s\n", packet.json)
-	//fmt.Printf("expected_json: %s\n", expected_json)
-	//fmt.Printf("packet.body: %s\n", packet.body)
-	//fmt.Printf("expected_body: %s\n", expected_body)
+	t.Logf("packet.json: %s\n", packet.json)
+	t.Logf("expected_json: %s\n", expected_json)
+	t.Logf("packet.body: %s\n", packet.body)
+	t.Logf("expected_body: %s\n", expected_body)
 
 	if packet.json != expected_json {
 		t.Log("json was found to be corrupted by encoding / decoding process")
