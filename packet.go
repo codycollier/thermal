@@ -1,7 +1,6 @@
 package thermal
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 )
@@ -30,16 +29,11 @@ func decodePacket(packetBytes []byte) (decodedPacket, error) {
 
 	if len(packetBytes) < 3 {
 		packet = decodedPacket{}
-		err = fmt.Errorf("Packet must be at least three packetBytes long")
+		err = fmt.Errorf("Packet must be at least three bytes long\n")
 		return packet, err
 	}
 
-	firstTwo := bytes.NewReader(packetBytes[:2])
-	err = binary.Read(firstTwo, binary.BigEndian, &headLength)
-	if err == nil {
-		packet = decodedPacket{}
-		return packet, fmt.Errorf("Packet head length is not a valid integer (err: %s)", err)
-	}
+	headLength = int(binary.BigEndian.Uint16(packetBytes[:2]))
 
 	bodyLength = len(packetBytes) - headLength - 2
 
@@ -71,7 +65,8 @@ func decodePacket(packetBytes []byte) (decodedPacket, error) {
 // encodePacket accepts json and body payloads and encodes them to a packet
 func encodePacket(json string, body []byte) ([]byte, error) {
 
-	var packet, headLength, head []byte
+	var headLength = make([]byte, 2)
+	var packet, head []byte
 	var err error
 	packet = make([]byte, 0)
 
@@ -82,12 +77,15 @@ func encodePacket(json string, body []byte) ([]byte, error) {
 	}
 
 	// The head-length will be the first two bytes of the packet (network byte order / big endian)
-	headBytes := new(bytes.Buffer)
-	err = binary.Write(headBytes, binary.BigEndian, len(head))
-	if err == nil {
-		return nil, fmt.Errorf("Error writing head length to packet (err: %s", err)
-	}
-	headLength = []byte(headBytes.Bytes())
+	/*
+		headBytes := new(bytes.Buffer)
+		err = binary.Write(headBytes, binary.BigEndian, len(head))
+		if err != nil {
+			return nil, fmt.Errorf("Error writing head length to packet (err: %s", err)
+		}
+		headLength = []byte(headBytes.Bytes())
+	*/
+	binary.BigEndian.PutUint16(headLength, uint16(len(head)))
 
 	// Assemble the packet
 	packet = append(packet, headLength...)
