@@ -443,7 +443,7 @@ somethingEncryptedOpenPacket(csid, openSomething
                         csdata.00-32  == auth - onetimeauth
                         csdata.33-64  == line_key - senders line level public key
                         csdata.rest   == inner_ciphertext (encrypted open packet)
-                        auth and decrypt the inner ciphertext
+                        sign and encrypt the inner ciphertext
 
 
 ---------(step 3b)-----------
@@ -461,14 +461,14 @@ somethingEncryptedChannelPacket(channelStuff)
                         head        == channel json(type, ...)
                         body        == sometimes some channel binary
 
-    csdata = cset.decryptChannelPacket(channelPacket)
+    csdata = cset.encryptChannelPacket(channelPacket)
                         # interface / plugin
                         cs1a:
                         cs2a:
                         cs3a:
                             csdata.00-24  == onetimeauth
                             csdata.rest   == inner_ciphertext (encrypted channel packet)
-                            auth and decrypt the inner ciphertext
+                            sign and encrypt the inner ciphertext
 
 
 
