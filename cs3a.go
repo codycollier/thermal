@@ -58,7 +58,7 @@ func (cs *cs3a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
 }
 
-func (cs *cs3a) encryptOpenPacket(packet []byte) csdata []byte {
+func (cs *cs3a) encryptOpenPacket(packet []byte) (csdata []byte) {
 
 	//------------------------------------------------------
 	// Setup the keys
@@ -100,11 +100,18 @@ func (cs *cs3a) encryptOpenPacket(packet []byte) csdata []byte {
 	// . assemble the rest of the outer packet BODY
 	// csdata = hmac + outerPacketData
 	//
+	return csdata
 
 }
 
-func (cs *cs3a) decryptOpenPacket(csdata []byte) packet []byte {}
+func (cs *cs3a) decryptOpenPacket(csdata []byte) (packet []byte) {
+	return packet
+}
 
-func (cs *cs3a) encryptLinePacket(packet []byte) csdata []byte {}
+func (cs *cs3a) encryptLinePacket(packet []byte) (csdata []byte) {
+	return csdata
+}
 
-func (cs *cs3a) decryptLinePacket(csdata []byte) packet []byte {}
+func (cs *cs3a) decryptLinePacket(csdata []byte) (packet []byte) {
+	return packet
+}
