@@ -23,7 +23,7 @@ type cs2a struct {
 }
 
 // init will generate a key pair and initialize the cipher set
-func (cs *cs2a) init() error {
+func (cs *cs2a) initialize() error {
 
 	// generate the rsa-2048 key pair
 	rsaPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)

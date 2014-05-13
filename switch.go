@@ -9,7 +9,7 @@ type Switch struct {
 	hashname string
 }
 
-func (s *Switch) Init() error {
+func (s *Switch) Initialize() error {
 
 	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
@@ -24,9 +24,9 @@ func (s *Switch) Init() error {
 
 	for csid, cset := range cpack {
 
-		log.Printf("init %s...\n", csid)
+		log.Printf("initialize %s...\n", csid)
 
-		err := cset.init()
+		err := cset.initialize()
 		if err != nil {
 			log.Printf("Error in initialization of cset. csid:%s  err: %s", csid, err)
 			return err

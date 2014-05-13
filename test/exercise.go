@@ -14,7 +14,7 @@ func exercise() {
 	log.Println("Starting exercise")
 
 	s := new(thermal.Switch)
-	s.Init()
+	s.Initialize()
 	log.Printf("Switch instance created: %s\n", *s)
 
 	log.Printf("Finished exercise (%s)\n", time.Since(start))

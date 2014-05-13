@@ -19,7 +19,7 @@ type cs3a struct {
 }
 
 // init will generate a key pair and initialize the cipher set
-func (cs *cs3a) init() error {
+func (cs *cs3a) initialize() error {
 
 	// generate the key pair
 	publicKey, privateKey, err := box.GenerateKey(rand.Reader)
