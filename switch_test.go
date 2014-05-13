@@ -14,7 +14,7 @@ func TestSwitchInit(t *testing.T) {
 
 	log.SetOutput(ioutil.Discard)
 	s := new(Switch)
-	err := s.Init()
+	err := s.Initialize()
 	if err != nil {
 		t.Fail()
 	}

@@ -40,7 +40,7 @@ func TestPartsExtraction(t *testing.T) {
 
 	testCPack := make(cipherPack)
 	cset := new(cs3a)
-	cset.init()
+	cset.initialize()
 	testCPack["cs3a"] = cset
 
 	testparts, err := extractParts(&testCPack)
@@ -91,7 +91,7 @@ func TestPartsExtractionBounraries(t *testing.T) {
 	cpack = make(cipherPack)
 
 	cset = new(cs3a)
-	cset.init()
+	cset.initialize()
 	cpack["cs3a"] = cset
 
 	cset = new(cs2a)
