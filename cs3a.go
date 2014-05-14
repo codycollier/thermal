@@ -1,8 +1,9 @@
 package thermal
 
 import (
-	//"code.google.com/p/go.crypto/nacl/secretbox"
 	"code.google.com/p/go.crypto/nacl/box"
+	"code.google.com/p/go.crypto/nacl/secretbox"
+	"code.google.com/p/go.crypto/poly1305"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
@@ -58,60 +59,51 @@ func (cs *cs3a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
 }
 
-func (cs *cs3a) encryptOpenPacket(packet []byte) (csdata []byte) {
+func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, err error) {
 
-	//------------------------------------------------------
-	// Setup the keys
-	//------------------------------------------------------
-	// . existing switch key pair
-	// . new line key pair?	// return?  store in local map?
+	// switch key pair
+	// cs.publicKey and cs.privateKey should already be populated
 
-	//------------------------------------------------------
+	// line key pair
+	linePublicKey, linePrivateKey, err := box.GenerateKey(rand.Reader)
+	if err != nil {
+		log.Println("Error generating NaCl keypair for line")
+		return openPacketBody, err
+	}
+
+	// todo - store the line key pair?  return it?
+
 	// Encrypt the inner packet
-	//------------------------------------------------------
-	// . 24 byte nonce of 0
-	// nonce = make([]byte, 24)
+	var nonce [24]byte
+	var lineSharedKey [32]byte
+	var encInnerPacket []byte
 
-	// . generate the shared secret
-	// crypto_box(agreedKey, receiver.pubkey, sender.line.prvkey)
+	box.Precompute(&lineSharedKey, receiverPublicKey, linePrivateKey)
+	secretbox.Seal(encInnerPacket, packet, &nonce, &lineSharedKey)
 
-	// . use secretbox to encrypt the inner packet
-	// encInnerPacket = crypto_secretbox(data, nonce, agreedKey)
+	// Generate the mac and assemble the body for the outer packet
+	// <mac><sender-line-public-key><encrypted-inner-packet-data>
+	var macKey [32]byte
+	var mac [16]byte
+	var openPacketData []byte
 
-	//------------------------------------------------------
-	// Generate the hmac and assemble the outer packet
-	//------------------------------------------------------
-	// . <open-HMAC><sender-line-public-key><encrypted-inner-packet-data>
-	// .		csdata.00-32  == auth - onetimeauth
-	// .		csdata.33-64  == line_key - senders line level public key
-	// .		csdata.rest   == inner_ciphertext (encrypted open packet)
+	box.Precompute(&macKey, receiverPublicKey, &cs.privateKey)
+	openPacketData = append(linePublicKey[:], encInnerPacket...)
+	poly1305.Sum(&mac, openPacketData, &macKey)
+	openPacketBody = append(mac[:], openPacketData...)
 
-	// . assemble part of the outer packet
-	// outerPacketData = sender_linekey.public + encInnerPacket
-
-	// . generate the macKey for use in generating the hmac
-	// crypto_box(macKey, receiver.pubkey, sender.prvkey)
-
-	// . generate the hmac
-	// hmac = crypto_onetimeauth(encInnerPacket, macKey)
-	// var hmac
-	// crypt.poly1305.sum(hmac, encInnerPacket, macKey)
-
-	// . assemble the rest of the outer packet BODY
-	// csdata = hmac + outerPacketData
-	//
-	return csdata
+	return openPacketBody, nil
 
 }
 
-func (cs *cs3a) decryptOpenPacket(csdata []byte) (packet []byte) {
+func (cs *cs3a) decryptOpenPacket(openPacketBody []byte) (packet []byte) {
 	return packet
 }
 
-func (cs *cs3a) encryptLinePacket(packet []byte) (csdata []byte) {
-	return csdata
+func (cs *cs3a) encryptLinePacket(packet []byte) (linePacketBody []byte) {
+	return linePacketBody
 }
 
-func (cs *cs3a) decryptLinePacket(csdata []byte) (packet []byte) {
+func (cs *cs3a) decryptLinePacket(linePacketBody []byte) (packet []byte) {
 	return packet
 }
