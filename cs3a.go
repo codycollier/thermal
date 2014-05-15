@@ -61,6 +61,8 @@ func (cs *cs3a) fingerprint() (string, string) {
 
 func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, err error) {
 
+	// todo - store or return the line shared key for use in line packet encryption
+
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
 
@@ -70,8 +72,6 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 		log.Println("Error generating NaCl keypair for line")
 		return openPacketBody, err
 	}
-
-	// todo - store the line key pair?  return it?
 
 	// Encrypt the inner packet
 	var nonce [24]byte
@@ -96,8 +96,46 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 
 }
 
-func (cs *cs3a) decryptOpenPacket(openPacketBody []byte) (packet []byte) {
-	return packet
+func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, err error) {
+
+	// todo - store or return the line shared key for use in line packet encryption
+
+	// switch key pair
+	// cs.publicKey and cs.privateKey should already be populated
+
+	// Unpack the outer packet body
+	// <mac><sender-line-public-key><encrypted-inner-packet-data>
+	var mac [16]byte
+	var senderLinePublicKey [32]byte
+	var encInnerPacket []byte
+	var openPacketData []byte
+
+	copy(mac[:], openPacketBody[:16])
+	copy(senderLinePublicKey[:], openPacketBody[16:48])
+	copy(encInnerPacket[:], openPacketBody[48:])
+	openPacketData = append(senderLinePublicKey[:], encInnerPacket...)
+
+	// Verify the mac
+	var authenticated bool
+	var macKey [32]byte
+
+	box.Precompute(&macKey, senderPublicKey, &cs.privateKey)
+	authenticated = poly1305.Verify(&mac, openPacketData, &macKey)
+	if !authenticated {
+		msg := "Incoming open packet failed MAC authentication"
+		log.Println(msg)
+		err = fmt.Errorf(msg)
+		return packet, err
+	}
+
+	// Decrypt the inner packet
+	var nonce [24]byte
+	var lineSharedKey [32]byte
+
+	box.Precompute(&lineSharedKey, &senderLinePublicKey, &cs.privateKey)
+	secretbox.Open(packet, encInnerPacket, &nonce, &lineSharedKey)
+
+	return packet, nil
 }
 
 func (cs *cs3a) encryptLinePacket(packet []byte) (linePacketBody []byte) {
