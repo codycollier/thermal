@@ -233,27 +233,29 @@ These are just scratch notes and will not match final code design.
 // Cipher sets produce keys, fingerprints, and encryption schemes
 . cipher_sets
     . interface for CipherSet
-        . generate()
-        . encrypt_line_packet()
-        . decrypt_line_packet()
+        . initialize()
+        . fingerprint() (csid, fingerprint)
+        . encryptOpenPacket(packet, recvPublicKey) (encOuterBody, lineSharedKey)
+        . decryptOpenPacket()
+        . makeLineEncryptionKey() ?
+
+        . encryptLinePacket()
+        . decryptLinePacket()
+        // Don't store or edit lines in cs
+
     . type bundle of CipherSet          // csid, fingerprint, pub, priv
     . type bundle of CipherSetParts     // csid, fingerprint
     . cs1a
     . cs2a
     . cs3a - Use NaCl to help drive interface design and backfit
-        . type CS3aCypherSet struct {
-            type FingerPrint string
-            type PublicKey []bytes
-            type PrivateKey []bytes
-            }
-        . generate()
-        . encrypt_line_packet()
-        . decrypt_line_packet()
 
 
 . hashname
 . packet(s)
+
 . line(s)
+    . ingress|egress
+
 . channel(s)
 
 
