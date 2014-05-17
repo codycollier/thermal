@@ -59,10 +59,7 @@ func (cs *cs3a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
 }
 
-func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, err error) {
-
-	// todo - return/store the egress line shared key for use in line packet encryption
-	// return lineSharedKey [32]byte or a more generic []byte for a common interface across ciphersets?
+func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, lineSharedSecret [32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -71,16 +68,15 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 	linePublicKey, linePrivateKey, err := box.GenerateKey(rand.Reader)
 	if err != nil {
 		log.Println("Error generating NaCl keypair for line")
-		return openPacketBody, err
+		return openPacketBody, lineSharedSecert, err
 	}
 
 	// Encrypt the inner packet
 	var nonce [24]byte
-	var lineSharedKey [32]byte
 	var encInnerPacket []byte
 
-	box.Precompute(&lineSharedKey, receiverPublicKey, linePrivateKey)
-	secretbox.Seal(encInnerPacket, packet, &nonce, &lineSharedKey)
+	box.Precompute(&lineSharedSecret, receiverPublicKey, linePrivateKey)
+	secretbox.Seal(encInnerPacket, packet, &nonce, &lineSharedSecret)
 
 	// Generate the mac and assemble the body for the outer packet
 	// <mac><sender-line-public-key><encrypted-inner-packet-data>
@@ -93,14 +89,11 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 	poly1305.Sum(&mac, openPacketData, &macKey)
 	openPacketBody = append(mac[:], openPacketData...)
 
-	return openPacketBody, nil
+	return openPacketBody, lineSharedSecret, nil
 
 }
 
-func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, err error) {
-
-	// todo - return/store the ingress line shared key for use in line packet decryption
-	// return lineSharedKey [32]byte or a more generic []byte for a common interface across ciphersets?
+func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, lineSharedSecret [32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -127,20 +120,19 @@ func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]by
 		msg := "Incoming open packet failed MAC authentication"
 		log.Println(msg)
 		err = fmt.Errorf(msg)
-		return packet, err
+		return packet, lineSharedSecret, err
 	}
 
 	// Decrypt the inner packet
 	var nonce [24]byte
-	var lineSharedKey [32]byte
 
-	box.Precompute(&lineSharedKey, &senderLinePublicKey, &cs.privateKey)
-	secretbox.Open(packet, encInnerPacket, &nonce, &lineSharedKey)
+	box.Precompute(&lineSharedSecret, &senderLinePublicKey, &cs.privateKey)
+	secretbox.Open(packet, encInnerPacket, &nonce, &lineSharedSecret)
 
-	return packet, nil
+	return packet, lineSharedSecret, nil
 }
 
-func (cs *cs3a) encryptLinePacket(packet []byte, lineSharedKey, senderLineId, receiverLineId []byte) (linePacketBody []byte) {
+func (cs *cs3a) encryptLinePacket(packet []byte, lineSharedSecret *[32]byte, senderLineId, receiverLineId *[16]byte) (linePacketBody []byte) {
 	var nonce [24]byte
 
 	rand.Reader.Read(nonce[:])
@@ -148,6 +140,6 @@ func (cs *cs3a) encryptLinePacket(packet []byte, lineSharedKey, senderLineId, re
 	return linePacketBody
 }
 
-func (cs *cs3a) decryptLinePacket(linePacketBody []byte) (packet []byte) {
+func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineSharedSecret *[32]byte, senderLineId, receiverLineId *[16]byte) (packet []byte) {
 	return packet
 }
