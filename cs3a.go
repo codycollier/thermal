@@ -61,7 +61,7 @@ func (cs *cs3a) fingerprint() (string, string) {
 
 func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, err error) {
 
-	// todo - store the egress line shared key for use in line packet encryption
+	// todo - return/store the egress line shared key for use in line packet encryption
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -98,7 +98,7 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 
 func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, err error) {
 
-	// todo - store the ingress line shared key for use in line packet decryption
+	// todo - return/store the ingress line shared key for use in line packet decryption
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
