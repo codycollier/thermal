@@ -62,6 +62,7 @@ func (cs *cs3a) fingerprint() (string, string) {
 func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, err error) {
 
 	// todo - return/store the egress line shared key for use in line packet encryption
+	// return lineSharedKey [32]byte or a more generic []byte for a common interface across ciphersets?
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -99,6 +100,7 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, err error) {
 
 	// todo - return/store the ingress line shared key for use in line packet decryption
+	// return lineSharedKey [32]byte or a more generic []byte for a common interface across ciphersets?
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -138,7 +140,7 @@ func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]by
 	return packet, nil
 }
 
-func (cs *cs3a) encryptLinePacket(packet []byte) (linePacketBody []byte) {
+func (cs *cs3a) encryptLinePacket(packet []byte, lineSharedKey, senderLineId, receiverLineId []byte) (linePacketBody []byte) {
 	var nonce [24]byte
 
 	rand.Reader.Read(nonce[:])
