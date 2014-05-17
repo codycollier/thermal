@@ -139,6 +139,10 @@ func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]by
 }
 
 func (cs *cs3a) encryptLinePacket(packet []byte) (linePacketBody []byte) {
+	var nonce [24]byte
+
+	rand.Reader.Read(nonce[:])
+
 	return linePacketBody
 }
 
