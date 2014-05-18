@@ -173,6 +173,11 @@ func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (l
 	return linePacketBody
 }
 
+// The cs3a encrypted line packet is <nonce><secretbox>
 func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte) {
+	var nonce [24]byte
+	copy(nonce[:], linePacketBody[:24])
+	linePacketData := linePacketBody[24:]
+	secretbox.Open(packet, linePacketData, &nonce, lineDecryptionKey)
 	return packet
 }
