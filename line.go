@@ -13,4 +13,4 @@ type lineSession struct {
 	decryptionKey [32]byte
 }
 
-type lineMap map[hashname]lineSession
+type lineMap map[string]lineSession

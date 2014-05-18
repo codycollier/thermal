@@ -6,9 +6,6 @@ import (
 	"sort"
 )
 
-// A hashname is a 64 byte hex string
-type hashname string
-
 // extractParts will pull out the hashname parts from a cipherPack
 func extractParts(cpack *cipherPack) (map[string]string, error) {
 
@@ -32,7 +29,7 @@ func extractParts(cpack *cipherPack) (map[string]string, error) {
 }
 
 // generateHashname will create a switch hashname from the given parts
-func generateHashname(parts map[string]string) (hashname, error) {
+func generateHashname(parts map[string]string) (string, error) {
 
 	if len(parts) == 0 {
 		return "", fmt.Errorf("parts map is empty")
@@ -63,7 +60,7 @@ func generateHashname(parts map[string]string) (hashname, error) {
 	}
 
 	hashnameBin := rollup
-	hashnameHex := hashname(fmt.Sprintf("%x", hashnameBin))
+	hashnameHex := fmt.Sprintf("%x", hashnameBin)
 
 	return hashnameHex, nil
 }
