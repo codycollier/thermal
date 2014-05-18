@@ -1,14 +1,14 @@
 package thermal
 
-type line struct {
+type lineHalf struct {
 	id           [16]byte
 	at           int
 	sharedSecret [32]byte
 }
 
 type lineSession struct {
-	localLine     line
-	remoteLine    line
+	local         lineHalf
+	remote        lineHalf
 	encryptionKey [32]byte
 	decryptionKey [32]byte
 }
