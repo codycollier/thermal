@@ -6,24 +6,15 @@
 :::::::::  todo  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 --------------------------------------------------------------------------------
 
-next items:
+next/current items:
 
 IP . switching logic
-IP . packet parsing
 
-. packet
-    . decodePacket
-    . encodePacket
+. generate line id
+. building a line session
+. line session management
 
-. cs3a/cipherSet interface
-    . makeOpenPacket
-    . processOpenPacket
-    . makeLinePacket
-    . processLinePacket
-
-
-. building a line
-
+. channel design and interaction with lines
 
 . loading seeds
 . saving/loading switch state
@@ -35,25 +26,24 @@ IP . packet parsing
 ::::::::::::::  snapshot  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 --------------------------------------------------------------------------------
 
-[rain test]$go run ./exercise.go
-2014/05/04 15:20:41.870071 Starting exercise
-2014/05/04 15:20:41.870263 Starting initialization of switch
-2014/05/04 15:20:41.870270 Starting initialization of cipher sets
-2014/05/04 15:20:41.870310 init cs2a...
-2014/05/04 15:20:43.078745        csid: cs2a
-2014/05/04 15:20:43.078774 fingerprint: 5a94f43fb6076add699f001db67604916d5a0adabf06a0125f177417b078bc39
-2014/05/04 15:20:43.078783 init cs3a...
-2014/05/04 15:20:43.078976        csid: cs3a
-2014/05/04 15:20:43.078986 fingerprint: 913b9c437c7cfad9e16b569c2fb17292f7760269eebb197c5f48d74fddc90fae
-2014/05/04 15:20:43.078993 Finished initialization of cipher sets
-2014/05/04 15:20:43.078999 Starting hashname creation
-2014/05/04 15:20:43.079033 switch hashname: f0ba6cb61921702ae646c7e487450036a0e21f5ac9398bd4bb8af98026900966
-2014/05/04 15:20:43.079106 Finished hashname creation
-2014/05/04 15:20:43.079116 Finished initialization of switch
-2014/05/04 15:20:43.079122 Switch ready
-2014/05/04 15:20:43.079164 Switch instance created: {f0ba6cb61921702ae646c7e487450036a0e21f5ac9398bd4bb8af98026900966}
-2014/05/04 15:20:43.079178 Finished exercise (1.209129485s)
-
+$go run ./exercise.go
+2014/05/18 10:01:00.145888 Starting exercise
+2014/05/18 10:01:00.146109 Starting initialization of switch
+2014/05/18 10:01:00.146117 Starting initialization of cipher sets
+2014/05/18 10:01:00.146161 initialize cs2a...
+2014/05/18 10:01:00.983971        csid: cs2a
+2014/05/18 10:01:00.983994 fingerprint: b85ca5648600689adff00a0010bde1c7740c119539f2ea6617fa8f3918f1664f
+2014/05/18 10:01:00.984004 initialize cs3a...
+2014/05/18 10:01:00.984181        csid: cs3a
+2014/05/18 10:01:00.984189 fingerprint: 4ce251de69d26a04b361d661b5ac20dafb771afee1f21dd2147014cf49b38643
+2014/05/18 10:01:00.984196 Finished initialization of cipher sets
+2014/05/18 10:01:00.984201 Starting hashname creation
+2014/05/18 10:01:00.984238 switch hashname: a24f27c8be4094574a119ceb501556e8db7d1ad622707188d7c7de26482276fe
+2014/05/18 10:01:00.984246 Finished hashname creation
+2014/05/18 10:01:00.984251 Finished initialization of switch
+2014/05/18 10:01:00.984256 Switch ready
+2014/05/18 10:01:00.984276 Switch instance created: {a24f27c8be4094574a119ceb501556e8db7d1ad622707188d7c7de26482276fe}
+2014/05/18 10:01:00.984291 Finished exercise (838.418981ms)
 
 
 
