@@ -6,7 +6,7 @@ import (
 
 // Switch provides an api to create, manage, and use a Telehash switch instance
 type Switch struct {
-	hashname string
+	hashname hashname
 }
 
 func (s *Switch) Initialize() error {

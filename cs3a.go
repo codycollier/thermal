@@ -59,7 +59,7 @@ func (cs *cs3a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
 }
 
-func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, lineSharedSecret [32]byte, err error) {
+func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, lineSharedSecret *[32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -68,15 +68,15 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (o
 	linePublicKey, linePrivateKey, err := box.GenerateKey(rand.Reader)
 	if err != nil {
 		log.Println("Error generating NaCl keypair for line")
-		return openPacketBody, lineSharedSecert, err
+		return openPacketBody, lineSharedSecret, err
 	}
 
 	// Encrypt the inner packet
 	var nonce [24]byte
 	var encInnerPacket []byte
 
-	box.Precompute(&lineSharedSecret, receiverPublicKey, linePrivateKey)
-	secretbox.Seal(encInnerPacket, packet, &nonce, &lineSharedSecret)
+	box.Precompute(lineSharedSecret, receiverPublicKey, linePrivateKey)
+	secretbox.Seal(encInnerPacket, packet, &nonce, lineSharedSecret)
 
 	// Generate the mac and assemble the body for the outer packet
 	// <mac><sender-line-public-key><encrypted-inner-packet-data>
@@ -132,14 +132,47 @@ func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]by
 	return packet, lineSharedSecret, nil
 }
 
-func (cs *cs3a) encryptLinePacket(packet []byte, lineSharedSecret *[32]byte, senderLineId, receiverLineId *[16]byte) (linePacketBody []byte) {
+// The line encryption key is sha256(line-secret, local-line-id, remote-line-id)
+func (cs *cs3a) generateLineEncryptionKey(lineSharedSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
+
+	hash256 := sha256.New()
+	hash256.Write(lineSharedSecret[:])
+	hash256.Write(localLineId[:])
+	hash256.Write(remoteLineId[:])
+	keyHash := hash256.Sum(nil)
+
+	copy(key[:], keyHash[:])
+
+	return key
+}
+
+// The line decryption key is sha256(line-secret, remote-line-id, local-line-id)
+func (cs *cs3a) generateLineDecryptionKey(lineSharedSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
+
+	hash256 := sha256.New()
+	hash256.Write(lineSharedSecret[:])
+	hash256.Write(remoteLineId[:])
+	hash256.Write(localLineId[:])
+	keyBin := hash256.Sum(nil)
+
+	copy(key[:], keyBin[:])
+
+	return key
+}
+
+// The cs3a encrypted line packet is <nonce><secretbox>
+func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte) {
 	var nonce [24]byte
+	var cipherText = make([]byte, 0)
 
 	rand.Reader.Read(nonce[:])
+	secretbox.Seal(cipherText, packet, &nonce, lineEncryptionKey)
+
+	linePacketBody = append(nonce[:], cipherText...)
 
 	return linePacketBody
 }
 
-func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineSharedSecret *[32]byte, senderLineId, receiverLineId *[16]byte) (packet []byte) {
+func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte) {
 	return packet
 }

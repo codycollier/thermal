@@ -22,6 +22,15 @@ type cs2a struct {
 	certificate    x509.Certificate
 }
 
+func (cs *cs2a) String() string {
+	return fmt.Sprintf("%s: %x", cs.id, cs.fingerprint)
+}
+
+// csid will return the id of the cipher set
+func (cs *cs2a) csid() string {
+	return cs.id
+}
+
 // init will generate a key pair and initialize the cipher set
 func (cs *cs2a) initialize() error {
 
@@ -65,20 +74,6 @@ func (cs *cs2a) initialize() error {
 
 }
 
-func (cs *cs2a) String() string {
-	return fmt.Sprintf("%s: %x", cs.id, cs.fingerprint)
-}
-
-// csid will return the id of the cipher set
-func (cs *cs2a) csid() string {
-	return cs.id
-}
-
-// fingerprint will return the csid and fingerprint for use in a 'parts' set
-func (cs *cs2a) fingerprint() (string, string) {
-	return cs.id, cs.fingerprintHex
-}
-
 // Generate a template x509 certificate
 func gen_x509_template() *x509.Certificate {
 	commonName := "thermal.telehash"
@@ -93,4 +88,35 @@ func gen_x509_template() *x509.Certificate {
 	cert.NotAfter = notAfter
 
 	return cert
+}
+
+// fingerprint will return the csid and fingerprint for use in a 'parts' set
+func (cs *cs2a) fingerprint() (string, string) {
+	return cs.id, cs.fingerprintHex
+}
+
+// Stubs for the interface
+
+func (cs *cs2a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, lineSharedSecret *[32]byte, err error) {
+	return openPacketBody, lineSharedSecret, err
+}
+
+func (cs *cs2a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, lineSharedSecret [32]byte, err error) {
+	return packet, lineSharedSecret, err
+}
+
+func (cs *cs2a) generateLineEncryptionKey(lineSharedSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
+	return key
+}
+
+func (cs *cs2a) generateLineDecryptionKey(lineSharedSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
+	return key
+}
+
+func (cs *cs2a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte) {
+	return linePacketBody
+}
+
+func (cs *cs2a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte) {
+	return packet
 }
