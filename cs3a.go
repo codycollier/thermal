@@ -166,10 +166,10 @@ func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, remotePublicKey *[32]by
 	return packet, remoteLineSecret, nil
 }
 
-// generateLineEncryptionKey returns a key suitable for outgoing line packet encryption,
-// in the form of sha256(local-line-secret, local-line-id, local-line-id)
+// generateLineEncryptionKey returns a key suitable for outgoing line packet encryption
 func (cs *cs3a) generateLineEncryptionKey(localLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
 
+	// sha256(local-line-secret, local-line-id, local-line-id)
 	hash256 := sha256.New()
 	hash256.Write(localLineSecret[:])
 	hash256.Write(localLineId[:])
@@ -181,10 +181,10 @@ func (cs *cs3a) generateLineEncryptionKey(localLineSecret *[32]byte, localLineId
 	return key
 }
 
-// generateLineDecryptionKey returns a key suitable for incoming line packet decryption,
-// in the form of sha256(remote-line-secret, remote-line-id, local-line-id)
+// generateLineDecryptionKey returns a key suitable for incoming line packet decryption
 func (cs *cs3a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
 
+	// sha256(remote-line-secret, remote-line-id, local-line-id)
 	hash256 := sha256.New()
 	hash256.Write(remoteLineSecret[:])
 	hash256.Write(remoteLineId[:])
@@ -196,8 +196,7 @@ func (cs *cs3a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineI
 	return key
 }
 
-// encryptLinePacket returns an encrypted and assembled outer line packet body
-// in the form <nonce><secretbox-ciphertext>
+// encryptLinePacket encrypts a channel packet and builds a line packet body
 func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
 	var nonce [24]byte
 	var linePacketData []byte
@@ -212,8 +211,7 @@ func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (l
 	return linePacketBody, nil
 }
 
-// decryptLinePacket returns a decrypted inner line packet
-// by disassembling and decrypting an outer packet body in the form <nonce><secretbox-ciphertext>
+// decryptLinePacket returns a decrypted channel packet from a line packet
 func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
 	var nonce [24]byte
 
