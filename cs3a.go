@@ -59,84 +59,119 @@ func (cs *cs3a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
 }
 
-func (cs *cs3a) encryptOpenPacket(packet []byte, receiverPublicKey *[32]byte) (openPacketBody []byte, lineSharedSecret *[32]byte, err error) {
+/*
+--------------------------------------------------------------------------------
+The CS3a Open Packet Handshake
+---------------------------------
+
+The cs3a encryption & decryption of an inner open packet, from the perspective
+of the sender and receiver:
+
+Sender:
+box.Precompute(senderLineSecret, receiverPublicKey, senderLinePrivateKey)
+secretbox.Seal(encInnerPacket, packet, &nonce, senderLineSecret)
+
+Receiver:
+box.Precompute(&senderLineSecret, &senderLinePublicKey, &receiverPrivateKey)
+secretbox.Open(packet, encInnerPacket, &nonce, &senderLineSecret)
+
+The sender/receiver context helps to highlight the public/private key pairings.
+
+However, the following functions use the context of local switch instance
+and remote switch instance instead.
+--------------------------------------------------------------------------------
+*/
+
+// encryptOpenPacket returns an assembled open packet body and a local line shared secret
+func (cs *cs3a) encryptOpenPacket(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
 
-	// line key pair
+	// temporary line key pair
 	linePublicKey, linePrivateKey, err := box.GenerateKey(rand.Reader)
 	if err != nil {
 		log.Println("Error generating NaCl keypair for line")
-		return openPacketBody, lineSharedSecret, err
+		return openPacketBody, localLineSecret, err
 	}
 
 	// Encrypt the inner packet
 	var nonce [24]byte
 	var encInnerPacket []byte
 
-	box.Precompute(lineSharedSecret, receiverPublicKey, linePrivateKey)
-	secretbox.Seal(encInnerPacket, packet, &nonce, lineSharedSecret)
+	box.Precompute(&localLineSecret, remotePublicKey, linePrivateKey)
+	encInnerPacket = secretbox.Seal(encInnerPacket, packet, &nonce, &localLineSecret)
 
 	// Generate the mac and assemble the body for the outer packet
-	// <mac><sender-line-public-key><encrypted-inner-packet-data>
+	// <mac><local-line-public-key><encrypted-inner-packet-data>
 	var macKey [32]byte
 	var mac [16]byte
 	var openPacketData []byte
 
-	box.Precompute(&macKey, receiverPublicKey, &cs.privateKey)
-	openPacketData = append(linePublicKey[:], encInnerPacket...)
+	box.Precompute(&macKey, remotePublicKey, &cs.privateKey)
+	openPacketData = append(openPacketData, linePublicKey[:]...)
+	openPacketData = append(openPacketData, encInnerPacket...)
 	poly1305.Sum(&mac, openPacketData, &macKey)
-	openPacketBody = append(mac[:], openPacketData...)
 
-	return openPacketBody, lineSharedSecret, nil
+	openPacketBody = append(openPacketBody, mac[:]...)
+	openPacketBody = append(openPacketBody, openPacketData...)
+
+	return openPacketBody, localLineSecret, nil
 
 }
 
-func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, senderPublicKey *[32]byte) (packet []byte, lineSharedSecret [32]byte, err error) {
+// decryptOpenPacket returns an unencrypted inner open packet and a remote line shared secret
+func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
 
 	// Unpack the outer packet body
-	// <mac><sender-line-public-key><encrypted-inner-packet-data>
+	// <mac><remote-line-public-key><encrypted-inner-packet-data>
 	var mac [16]byte
-	var senderLinePublicKey [32]byte
+	var remoteLinePublicKey [32]byte
 	var encInnerPacket []byte
 	var openPacketData []byte
 
 	copy(mac[:], openPacketBody[:16])
-	copy(senderLinePublicKey[:], openPacketBody[16:48])
-	copy(encInnerPacket[:], openPacketBody[48:])
-	openPacketData = append(senderLinePublicKey[:], encInnerPacket...)
+	copy(remoteLinePublicKey[:], openPacketBody[16:48])
+	encInnerPacket = append(encInnerPacket, openPacketBody[48:]...)
+	openPacketData = append(openPacketData, remoteLinePublicKey[:]...)
+	openPacketData = append(openPacketData, encInnerPacket...)
 
 	// Verify the mac
 	var authenticated bool
 	var macKey [32]byte
 
-	box.Precompute(&macKey, senderPublicKey, &cs.privateKey)
+	box.Precompute(&macKey, remotePublicKey, &cs.privateKey)
 	authenticated = poly1305.Verify(&mac, openPacketData, &macKey)
 	if !authenticated {
 		msg := "Incoming open packet failed MAC authentication"
 		log.Println(msg)
 		err = fmt.Errorf(msg)
-		return packet, lineSharedSecret, err
+		return packet, remoteLineSecret, err
 	}
 
 	// Decrypt the inner packet
 	var nonce [24]byte
 
-	box.Precompute(&lineSharedSecret, &senderLinePublicKey, &cs.privateKey)
-	secretbox.Open(packet, encInnerPacket, &nonce, &lineSharedSecret)
+	box.Precompute(&remoteLineSecret, &remoteLinePublicKey, &cs.privateKey)
+	packet, success := secretbox.Open(packet, encInnerPacket, &nonce, &remoteLineSecret)
+	if !success {
+		err := fmt.Errorf("Error opening the secretbox")
+		return packet, remoteLineSecret, err
+	}
 
-	return packet, lineSharedSecret, nil
+	log.Printf("packet: %x\n", packet)
+	return packet, remoteLineSecret, nil
 }
 
-// The line encryption key is sha256(line-secret, local-line-id, remote-line-id)
-func (cs *cs3a) generateLineEncryptionKey(lineSharedSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
+// generateLineEncryptionKey returns a key suitable for outgoing line packet encryption,
+// in the form of sha256(local-line-secret, local-line-id, local-line-id)
+func (cs *cs3a) generateLineEncryptionKey(localLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
 
 	hash256 := sha256.New()
-	hash256.Write(lineSharedSecret[:])
+	hash256.Write(localLineSecret[:])
 	hash256.Write(localLineId[:])
 	hash256.Write(remoteLineId[:])
 	keyHash := hash256.Sum(nil)
@@ -146,11 +181,12 @@ func (cs *cs3a) generateLineEncryptionKey(lineSharedSecret *[32]byte, localLineI
 	return key
 }
 
-// The line decryption key is sha256(line-secret, remote-line-id, local-line-id)
-func (cs *cs3a) generateLineDecryptionKey(lineSharedSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
+// generateLineDecryptionKey returns a key suitable for incoming line packet decryption,
+// in the form of sha256(remote-line-secret, remote-line-id, local-line-id)
+func (cs *cs3a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
 
 	hash256 := sha256.New()
-	hash256.Write(lineSharedSecret[:])
+	hash256.Write(remoteLineSecret[:])
 	hash256.Write(remoteLineId[:])
 	hash256.Write(localLineId[:])
 	keyBin := hash256.Sum(nil)
@@ -160,20 +196,21 @@ func (cs *cs3a) generateLineDecryptionKey(lineSharedSecret *[32]byte, localLineI
 	return key
 }
 
-// The cs3a encrypted line packet is <nonce><secretbox>
+// encryptLinePacket returns an encrypted and assembled outer line packet body
+// in the form <nonce><secretbox-ciphertext>
 func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte) {
 	var nonce [24]byte
 	var cipherText = make([]byte, 0)
 
 	rand.Reader.Read(nonce[:])
 	secretbox.Seal(cipherText, packet, &nonce, lineEncryptionKey)
-
 	linePacketBody = append(nonce[:], cipherText...)
 
 	return linePacketBody
 }
 
-// The cs3a encrypted line packet is <nonce><secretbox>
+// decryptLinePacket returns a decrypted inner line packet
+// by disassembling and decrypting an outer packet body in the form <nonce><secretbox-ciphertext>
 func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte) {
 	var nonce [24]byte
 	copy(nonce[:], linePacketBody[:24])

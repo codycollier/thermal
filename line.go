@@ -6,9 +6,9 @@ import (
 )
 
 type lineHalf struct {
-	id           [16]byte
-	at           int
-	sharedSecret [32]byte
+	id     [16]byte
+	at     int
+	secret [32]byte
 }
 
 type lineSession struct {
