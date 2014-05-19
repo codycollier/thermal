@@ -113,10 +113,10 @@ func (cs *cs2a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineI
 	return key
 }
 
-func (cs *cs2a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte) {
-	return linePacketBody
+func (cs *cs2a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
+	return linePacketBody, nil
 }
 
-func (cs *cs2a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte) {
-	return packet
+func (cs *cs2a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
+	return packet, nil
 }

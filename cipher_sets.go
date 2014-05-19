@@ -11,8 +11,8 @@ type cipherSet interface {
 	generateLineEncryptionKey(localLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) [32]byte
 	generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) [32]byte
 
-	encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte)
-	decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte)
+	encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error)
+	decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error)
 }
 
 // A cipherPack holds a group of cipher sets

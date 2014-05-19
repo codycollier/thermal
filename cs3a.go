@@ -162,7 +162,7 @@ func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, remotePublicKey *[32]by
 		return packet, remoteLineSecret, err
 	}
 
-	log.Printf("packet: %x\n", packet)
+	//log.Printf("packet: %x\n", packet)
 	return packet, remoteLineSecret, nil
 }
 
@@ -198,23 +198,35 @@ func (cs *cs3a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineI
 
 // encryptLinePacket returns an encrypted and assembled outer line packet body
 // in the form <nonce><secretbox-ciphertext>
-func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte) {
+func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
 	var nonce [24]byte
-	var cipherText = make([]byte, 0)
+	var linePacketData []byte
 
+	// encrypt the inner channel packet
 	rand.Reader.Read(nonce[:])
-	secretbox.Seal(cipherText, packet, &nonce, lineEncryptionKey)
-	linePacketBody = append(nonce[:], cipherText...)
+	linePacketData = secretbox.Seal(linePacketData, packet, &nonce, lineEncryptionKey)
 
-	return linePacketBody
+	// assemble: <nonce><secretbox-ciphertext>
+	linePacketBody = append(nonce[:], linePacketData[:]...)
+
+	return linePacketBody, nil
 }
 
 // decryptLinePacket returns a decrypted inner line packet
 // by disassembling and decrypting an outer packet body in the form <nonce><secretbox-ciphertext>
-func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte) {
+func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
 	var nonce [24]byte
+
+	// disassemble: <nonce><secretbox-ciphertext>
 	copy(nonce[:], linePacketBody[:24])
 	linePacketData := linePacketBody[24:]
-	secretbox.Open(packet, linePacketData, &nonce, lineDecryptionKey)
-	return packet
+
+	// decrypt the inner channel packet
+	packet, success := secretbox.Open(packet, linePacketData, &nonce, lineDecryptionKey)
+	if !success {
+		err := fmt.Errorf("Error opening the secretbox")
+		return packet, err
+	}
+
+	return packet, nil
 }
