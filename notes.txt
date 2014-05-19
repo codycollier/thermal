@@ -10,7 +10,6 @@ next/current items:
 
 IP . switching logic
 
-. generate line id
 . building a line session
 . line session management
 
@@ -27,23 +26,20 @@ IP . switching logic
 --------------------------------------------------------------------------------
 
 $go run ./exercise.go
-2014/05/18 10:01:00.145888 Starting exercise
-2014/05/18 10:01:00.146109 Starting initialization of switch
-2014/05/18 10:01:00.146117 Starting initialization of cipher sets
-2014/05/18 10:01:00.146161 initialize cs2a...
-2014/05/18 10:01:00.983971        csid: cs2a
-2014/05/18 10:01:00.983994 fingerprint: b85ca5648600689adff00a0010bde1c7740c119539f2ea6617fa8f3918f1664f
-2014/05/18 10:01:00.984004 initialize cs3a...
-2014/05/18 10:01:00.984181        csid: cs3a
-2014/05/18 10:01:00.984189 fingerprint: 4ce251de69d26a04b361d661b5ac20dafb771afee1f21dd2147014cf49b38643
-2014/05/18 10:01:00.984196 Finished initialization of cipher sets
-2014/05/18 10:01:00.984201 Starting hashname creation
-2014/05/18 10:01:00.984238 switch hashname: a24f27c8be4094574a119ceb501556e8db7d1ad622707188d7c7de26482276fe
-2014/05/18 10:01:00.984246 Finished hashname creation
-2014/05/18 10:01:00.984251 Finished initialization of switch
-2014/05/18 10:01:00.984256 Switch ready
-2014/05/18 10:01:00.984276 Switch instance created: {a24f27c8be4094574a119ceb501556e8db7d1ad622707188d7c7de26482276fe}
-2014/05/18 10:01:00.984291 Finished exercise (838.418981ms)
+2014/05/18 21:09:09.584257 Starting exercise
+2014/05/18 21:09:09.584452 Starting initialization of switch
+2014/05/18 21:09:09.584459 Starting initialization of cipher sets
+2014/05/18 21:09:09.584504 initialize cs3a...
+2014/05/18 21:09:09.585235        csid: cs3a
+2014/05/18 21:09:09.585246 fingerprint: 9c0c5d479d132f8d1d41d596588d0a6a3b463519f4c06202caa696e46d658919
+2014/05/18 21:09:09.585254 Finished initialization of cipher sets
+2014/05/18 21:09:09.585259 Starting hashname creation
+2014/05/18 21:09:09.585304 switch hashname: 629012b6697e4c275fdb4cbcce9243648cab12421151b10b21296c051ceaec95
+2014/05/18 21:09:09.585312 Finished hashname creation
+2014/05/18 21:09:09.585317 Finished initialization of switch
+2014/05/18 21:09:09.585323 Switch ready
+2014/05/18 21:09:09.585367 Switch instance created: {629012b6697e4c275fdb4cbcce9243648cab12421151b10b21296c051ceaec95}
+2014/05/18 21:09:09.585382 Finished exercise (1.141046ms)
 
 
 

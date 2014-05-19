@@ -19,7 +19,7 @@ func (s *Switch) Initialize() error {
 	log.Println("Starting initialization of cipher sets")
 
 	cpack := make(cipherPack)
-	cpack["cs2a"] = new(cs2a)
+	//cpack["cs2a"] = new(cs2a)
 	cpack["cs3a"] = new(cs3a)
 
 	for csid, cset := range cpack {
