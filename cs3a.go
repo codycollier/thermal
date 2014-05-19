@@ -83,7 +83,7 @@ and remote switch instance instead.
 */
 
 // encryptOpenPacket returns an assembled open packet body and a local line shared secret
-func (cs *cs3a) encryptOpenPacket(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error) {
+func (cs *cs3a) encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -121,7 +121,7 @@ func (cs *cs3a) encryptOpenPacket(packet []byte, remotePublicKey *[32]byte) (ope
 }
 
 // decryptOpenPacket returns an unencrypted inner open packet and a remote line shared secret
-func (cs *cs3a) decryptOpenPacket(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error) {
+func (cs *cs3a) decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error) {
 
 	// switch key pair
 	// cs.publicKey and cs.privateKey should already be populated
@@ -197,7 +197,7 @@ func (cs *cs3a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineI
 }
 
 // encryptLinePacket encrypts a channel packet and builds a line packet body
-func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
+func (cs *cs3a) encryptLinePacketBody(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
 	var nonce [24]byte
 	var linePacketData []byte
 
@@ -212,7 +212,7 @@ func (cs *cs3a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (l
 }
 
 // decryptLinePacket returns a decrypted channel packet from a line packet
-func (cs *cs3a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
+func (cs *cs3a) decryptLinePacketBody(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
 	var nonce [24]byte
 
 	// disassemble: <nonce><secretbox-ciphertext>

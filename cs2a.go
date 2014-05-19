@@ -97,11 +97,11 @@ func (cs *cs2a) fingerprint() (string, string) {
 
 // Stubs for the interface
 
-func (cs *cs2a) encryptOpenPacket(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error) {
+func (cs *cs2a) encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error) {
 	return openPacketBody, localLineSecret, err
 }
 
-func (cs *cs2a) decryptOpenPacket(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error) {
+func (cs *cs2a) decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error) {
 	return packet, remoteLineSecret, err
 }
 
@@ -113,10 +113,10 @@ func (cs *cs2a) generateLineDecryptionKey(remoteLineSecret *[32]byte, localLineI
 	return key
 }
 
-func (cs *cs2a) encryptLinePacket(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
+func (cs *cs2a) encryptLinePacketBody(packet []byte, lineEncryptionKey *[32]byte) (linePacketBody []byte, err error) {
 	return linePacketBody, nil
 }
 
-func (cs *cs2a) decryptLinePacket(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
+func (cs *cs2a) decryptLinePacketBody(linePacketBody []byte, lineDecryptionKey *[32]byte) (packet []byte, err error) {
 	return packet, nil
 }

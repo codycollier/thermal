@@ -40,7 +40,7 @@ func Test3aFingerprint(t *testing.T) {
 
 }
 
-func Test3aEncryptOpenPacket(t *testing.T) {
+func Test3aEncryptOpenPacketBody(t *testing.T) {
 
 	var remotePublicKey [32]byte
 	rand.Reader.Read(remotePublicKey[:])
@@ -49,7 +49,7 @@ func Test3aEncryptOpenPacket(t *testing.T) {
 	cset := new(cs3a)
 	cset.initialize()
 
-	openPacketBody, lineSecretA, err := cset.encryptOpenPacket(originalPacket, &remotePublicKey)
+	openPacketBody, lineSecretA, err := cset.encryptOpenPacketBody(originalPacket, &remotePublicKey)
 	if err != nil {
 		t.Logf("Error: %s", err)
 		t.Fail()
@@ -67,7 +67,7 @@ func Test3aEncryptOpenPacket(t *testing.T) {
 
 }
 
-func Test3aEncryptAndDecryptOpenPacket(t *testing.T) {
+func Test3aEncryptAndDecryptOpenPacketBody(t *testing.T) {
 
 	var err error
 	originalPacket := []byte("This is an internal open packet")
@@ -78,12 +78,12 @@ func Test3aEncryptAndDecryptOpenPacket(t *testing.T) {
 	csetReceiver := new(cs3a)
 	err = csetReceiver.initialize()
 
-	openPacketBody, lineSecretA, err := csetSender.encryptOpenPacket(originalPacket, &csetReceiver.publicKey)
+	openPacketBody, lineSecretA, err := csetSender.encryptOpenPacketBody(originalPacket, &csetReceiver.publicKey)
 	if err != nil {
 		t.Logf("Error: %s", err)
 		t.Fail()
 	}
-	returnedPacket, lineSecretB, err := csetReceiver.decryptOpenPacket(openPacketBody, &csetSender.publicKey)
+	returnedPacket, lineSecretB, err := csetReceiver.decryptOpenPacketBody(openPacketBody, &csetSender.publicKey)
 	if err != nil {
 		t.Logf("Error: %s", err)
 		t.Fail()
@@ -177,7 +177,7 @@ func Test3aGenerateLineDecryptionKey(t *testing.T) {
 
 }
 
-func Test3aEncryptLinePacket(t *testing.T) {
+func Test3aEncryptLinePacketBody(t *testing.T) {
 
 	var localLineSecret [32]byte
 	var localLineId [16]byte
@@ -192,7 +192,7 @@ func Test3aEncryptLinePacket(t *testing.T) {
 
 	packet := []byte("This is a channel packet inside the line packet")
 	lineEncryptionKey := cset.generateLineEncryptionKey(&localLineSecret, &localLineId, &remoteLineId)
-	linePacketBody, err := cset.encryptLinePacket(packet, &lineEncryptionKey)
+	linePacketBody, err := cset.encryptLinePacketBody(packet, &lineEncryptionKey)
 	if err != nil {
 		t.Logf("Error encrypting line packet")
 		t.Fail()
@@ -205,7 +205,7 @@ func Test3aEncryptLinePacket(t *testing.T) {
 
 }
 
-func Test3aEncryptAndDecryptLinePacket(t *testing.T) {
+func Test3aEncryptAndDecryptLinePacketBody(t *testing.T) {
 
 	var localLineSecret [32]byte
 	var localLineId [16]byte
@@ -222,12 +222,12 @@ func Test3aEncryptAndDecryptLinePacket(t *testing.T) {
 	lineDecryptionKey := cset.generateLineDecryptionKey(&localLineSecret, &remoteLineId, &localLineId)
 
 	originalPacket := []byte("This is a channel packet inside the line packet")
-	linePacketBody, err := cset.encryptLinePacket(originalPacket, &lineEncryptionKey)
+	linePacketBody, err := cset.encryptLinePacketBody(originalPacket, &lineEncryptionKey)
 	if err != nil {
 		t.Logf("Error encrypting line packet")
 		t.Fail()
 	}
-	returnedPacket, err := cset.decryptLinePacket(linePacketBody, &lineDecryptionKey)
+	returnedPacket, err := cset.decryptLinePacketBody(linePacketBody, &lineDecryptionKey)
 	if err != nil {
 		t.Logf("Error decrypting line packet")
 		t.Fail()
