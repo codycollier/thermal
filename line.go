@@ -20,7 +20,7 @@ type lineSession struct {
 
 type lineMap map[string]lineSession
 
-// Generate a random 16 char hex encoded string to be used as a line id
+// generateLineId returns a random 16 char hex encoded string
 func generateLineId() string {
 	var idBin [8]byte
 	rand.Reader.Read(idBin[:])
