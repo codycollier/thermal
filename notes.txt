@@ -566,6 +566,23 @@ assemble
 
 --------------------------------------------
 
+// channel packet... 
+// need a line to remote...
+
+// get the lineSession from the lineMap
+// return the line
+//
+// or
+//
+// create a new lineSession
+    // create and send an open (localLine)
+    // wait
+    // accept an open (remoteLine)
+// add it to the lineMap
+// return the line
+
+
+
 type lineHalf struct {
     id     [16]byte
     at     int
