@@ -1,5 +1,9 @@
 package thermal
 
+import (
+	"fmt"
+)
+
 // The cipherSet interface defines behavior expected from a cipher set plugin
 type cipherSet interface {
 	initialize() error
