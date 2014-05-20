@@ -564,11 +564,47 @@ assemble
         . generate the 'agreedKey' (shared secret)
         . decrypt the inner packet using crypto_secretbox_open
 
+--------------------------------------------
+
+type lineHalf struct {
+    id     [16]byte
+    at     int
+    secret [32]byte
+}
+
+type lineSession struct {
+    local         lineHalf
+    remote        lineHalf
+    encryptionKey [32]byte
+    decryptionKey [32]byte
+}
 
 
--------------------------
-: line encrypt/decrypt
--------------------------
+func newLocalLine(to string, parts map[string]string, cset cipherSet) {
+
+    //
+    // create a new localLine
+    //
+    // localLine.id -- generate new line id
+    // localLine.at -- generate a new at
+    // localLine.secret -- later...
+    //
+    //
+    // json := make the json (to, from(parts), at, localLineId)
+    // body := cset.publicKey -- needs to be a part of the interface? getPublicKey?
+    // packet := encodePacket(json, body)
+    // openPacketBody, localLineSecret, err := encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte)
+    //
+    // localLine.secret = localLineSecret
+    // 
+    // openPacketJson := ""
+    // openPacketBody := openPacketBody
+    // openPacket := encodePacket(openPacketJson, openPacketBody)
+    //
+    // send...
+    // 
+
+}
 
 
 
