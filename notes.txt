@@ -566,7 +566,12 @@ assemble
 
 --------------------------------------------
 
-// channel packet... 
+//---------------------
+// line manager?
+// has an input channel?
+//---------------------
+
+// send a channel packet... 
 // need a line to remote...
 
 // get the lineSession from the lineMap
@@ -578,6 +583,7 @@ assemble
     // create and send an open (localLine)
     // wait
     // accept an open (remoteLine)
+
 // add it to the lineMap
 // return the line
 
