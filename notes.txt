@@ -581,8 +581,11 @@ assemble
 //
 // create a new lineSession
     // create and send an open (localLine)
-    // wait
+
+    // wait.  or, have central state to indicate status, and allow for decoupled routing
+
     // accept an open (remoteLine)
+        // match to the in-progress line session initialization
 
 // add it to the lineMap
 // return the line
