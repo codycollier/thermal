@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"log"
+	"time"
 )
 
 //-----------------------------------------------------------------------------
@@ -66,7 +67,7 @@ func (store *lineStore) start() {
 // A lineHalf is one half (local or remote) of a Line
 type lineHalf struct {
 	id     string
-	at     int
+	at     int64
 	secret [32]byte
 }
 
@@ -133,6 +134,6 @@ func generateLineId() string {
 }
 
 // generateLineAt returds an integer timestamp suitable for a line at
-func generateLineAt() int {
-	return 0
+func generateLineAt() int64 {
+	return time.Now().Unix()
 }
