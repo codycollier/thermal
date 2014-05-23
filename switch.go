@@ -53,9 +53,9 @@ func (s *Switch) Initialize() error {
 	log.Printf("switch hashname: %s", s.hashname)
 	log.Println("Finished hashname creation")
 
-	// setup the line map
-	linemap := make(lineMap)
-	log.Printf("line map: %s", linemap)
+	// setup the line storage
+	linestore := new(lineStore)
+	linestore.start()
 
 	// end
 	log.Println("Finished initialization of switch")

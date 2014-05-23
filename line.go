@@ -3,22 +3,126 @@ package thermal
 import (
 	"crypto/rand"
 	"fmt"
+	"log"
 )
 
+//-----------------------------------------------------------------------------
+// Router
+// The router helps decouple lines from channels and paths.
+//-----------------------------------------------------------------------------
+
+// routeToLine will route packets to their appropriate line
+func routeToLine() {
+}
+
+//-----------------------------------------------------------------------------
+// Line Store
+// The line store is a service which manages the mapping of remote switches
+// to lines.
+//-----------------------------------------------------------------------------
+
+// The storeRequest represents requests for lines
+type storeRequest struct {
+	hashname string
+	response chan *lineSession
+}
+
+// The lineStore holds and manages the lines
+type lineStore struct {
+	lineMap map[string]*lineSession
+	request chan *storeRequest
+}
+
+// The service func listens and handles incoming requests
+func (store *lineStore) service() {
+	for {
+		select {
+
+		case request := <-store.request:
+			// Get or Create a line for the hashname
+			line, exists := store.lineMap[request.hashname]
+			if !exists {
+				line := new(lineSession)
+				line.start()
+				store.lineMap[request.hashname] = line
+			}
+			request.response <- line
+
+		default:
+		}
+	}
+}
+
+// start will setup the listener to service requests
+func (store *lineStore) start() {
+	go store.service()
+}
+
+//-----------------------------------------------------------------------------
+// Line(s)
+// Representation and logic for telehash lines
+//-----------------------------------------------------------------------------
+
+// A lineHalf is one half (local or remote) of a Line
 type lineHalf struct {
-	id     [16]byte
+	id     string
 	at     int
 	secret [32]byte
 }
 
+// A lineSession represents a telehash Line between two switches
 type lineSession struct {
-	local         lineHalf
-	remote        lineHalf
-	encryptionKey [32]byte
-	decryptionKey [32]byte
+	remoteHashname string
+	local          lineHalf
+	remote         lineHalf
+	encryptionKey  [32]byte
+	decryptionKey  [32]byte
 }
 
-type lineMap map[string]lineSession
+// service will listen and respond to open/send/recv messages
+func (line *lineSession) service() {
+}
+
+// start will setup the line listener
+func (line *lineSession) start() {
+	go line.service()
+}
+
+// newLocalLine will craft and return an open packet and related data
+func (line *lineSession) newLocalLine(to string, parts map[string]string, cset cipherSet) {
+
+	line.local.id = generateLineId()
+	line.local.at = generateLineAt()
+
+	// todo
+	// get the hashname's public key
+	remotePublicKey := new([32]byte)
+
+	// todo
+	// json := make the json (to, from(parts), at, localLineId)
+	json := "{}"
+	body := cset.pubKey()[:]
+	packet, err := encodePacket(json, body)
+	openPacketBody, localLineSecret, err := cset.encryptOpenPacketBody(packet, remotePublicKey)
+	if err != nil {
+		log.Printf("Error encrypting open packet body (err: %s)", err)
+		return
+	}
+
+	line.local.secret = localLineSecret
+
+	// todo
+	openPacketJson := "{}"
+	openPacket, err := encodePacket(openPacketJson, openPacketBody)
+	if err != nil {
+		log.Printf("Error encoding open packet (err: %s)", err)
+		return
+	}
+	log.Println(openPacket)
+
+	// todo
+	// return or send
+}
 
 // generateLineId returns a random 16 char hex encoded string
 func generateLineId() string {
@@ -26,4 +130,9 @@ func generateLineId() string {
 	rand.Reader.Read(idBin[:])
 	idHex := fmt.Sprintf("%x", idBin)
 	return idHex
+}
+
+// generateLineAt returds an integer timestamp suitable for a line at
+func generateLineAt() int {
+	return 0
 }

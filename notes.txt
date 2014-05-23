@@ -613,11 +613,6 @@ c.send <- message
 
 
 
-
-
-
-
-
 type lineMap map[hashname/string]line
 
 (lm *lineMap) func getLine() {
@@ -636,38 +631,42 @@ type line struct {
     openLocal       chan bool
     openRemote      chan packet
 
-    // send/recv line packets
-    send chan
-    recv chan
+    // send/recv line packets (buffered?)
+    send            chan packet
+    recv            chan packet
 }
 
 (l *line) router() {
-    select {
 
-    case msg <-c.openLocal:
-        // create and send an open (localLine)
-        l.newLocalLine()
-        c.openLocal = nil
+    for {
+        select {
 
-    case msg <-c.openRemote:
-        // accept an open (remoteLine)
-        l.newRemoteLine()
-        c.openRemote = nil
+            case <-c.openLocal:
+                // create and send an open (localLine)
+                l.newLocalLine()
+                c.openLocal = nil
 
-        // if needed, setup the local line
-        if !c.local:
-            c.openLocal <- True
+            case msg <-c.openRemote:
+                // accept an open (remoteLine)
+                l.newRemoteLine()
+                c.openRemote = nil
 
-    case msg <-c.send:
-        go c.process.send(msg)
-        // inside send(), block on initializing
+                // if needed, setup the local line
+                if !c.local:
+                    c.openLocal <- True
 
-    case msg <-c.recv:
-        go c.process.recv(msg)
+            case msg <-c.send:
+                go c.process.send(msg)
+                // inside send(), block on initializing
 
-    default:
-        if c.local and c.remote:
-            close(c.initialzing)
+            case msg <-c.recv:
+                go c.process.recv(msg)
+                // inside recv(), block on initializing
+
+            default:
+                if c.local and c.remote:
+                    close(c.initialized)
+        }
     }
 }
 
