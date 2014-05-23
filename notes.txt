@@ -618,8 +618,43 @@ c.send <- message
 
 type lineMap map[?]line
 
-(lm *lineMap) getLine() {
+(lm *lineMap) func getLine() {
     // mutex?
+}
+
+(lm *lineMap) func createNewLine() {
+
+    // create a new lineSession
+    create and send an open (localLine)
+
+    wait:
+        - have central state to indicate status, and allow for decoupled routing
+        - linesession has an input channel, and waits on the response
+
+    accept an open (remoteLine)
+        match to the in-progress line session initialization
+}
+(lm *lineMap) func newLocalLine(to string, parts map[string]string, cset cipherSet) {
+
+    create a new localLine
+
+    localLine.id -- generate new line id
+    localLine.at -- generate a new at
+    localLine.secret -- later...
+
+    json := make the json (to, from(parts), at, localLineId)
+    body := cset.publicKey -- needs to be a part of the interface? getPublicKey?
+    packet := encodePacket(json, body)
+    openPacketBody, localLineSecret, err := encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte)
+
+    localLine.secret = localLineSecret
+
+    openPacketJson := ""
+    openPacketBody := openPacketBody
+    openPacket := encodePacket(openPacketJson, openPacketBody)
+
+    store partial line in the line map...
+    send...
 }
 
 type line struct {
@@ -662,39 +697,8 @@ l.send <- message
 
 
 
-create a new lineSession
-    create and send an open (localLine)
-
-    wait:
-        - have central state to indicate status, and allow for decoupled routing
-        - linesession has an input channel, and waits on the response
-
-    accept an open (remoteLine)
-        match to the in-progress line session initialization
 
 
-func newLocalLine(to string, parts map[string]string, cset cipherSet) {
-
-    create a new localLine
-
-    localLine.id -- generate new line id
-    localLine.at -- generate a new at
-    localLine.secret -- later...
-
-    json := make the json (to, from(parts), at, localLineId)
-    body := cset.publicKey -- needs to be a part of the interface? getPublicKey?
-    packet := encodePacket(json, body)
-    openPacketBody, localLineSecret, err := encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte)
-
-    localLine.secret = localLineSecret
-
-    openPacketJson := ""
-    openPacketBody := openPacketBody
-    openPacket := encodePacket(openPacketJson, openPacketBody)
-
-    send...
-
-}
 
 
 
