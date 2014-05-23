@@ -12,7 +12,6 @@ IP . switching logic
 
 . building a line session
 . line session management
-
 . channel design and interaction with lines
 
 . loading seeds
@@ -496,11 +495,13 @@ make outer packet (csdata, )
 
 
 ---------(step 5)-----------
----------(step 5)-----------
----------(step 5)-----------
+---------(step 6)-----------
+---------(step 7)-----------
 
 
-----------------------------------
+-------------------------
+:: words
+-------------------------
 encode
 decode
 process
@@ -512,16 +513,8 @@ repack
 unpack
 assemble
 
-
-
-
-----------------------------------------------------------------------
-: channel handling
-----------------------------------------------------------------------
-
- 
 -------------------------
-: open handshake
+:: open handshake
 -------------------------
 
 . cipher set initialization at switch initialization
@@ -564,74 +557,144 @@ assemble
         . generate the 'agreedKey' (shared secret)
         . decrypt the inner packet using crypto_secretbox_open
 
---------------------------------------------
 
-//---------------------
-// line manager?
-// has an input channel?
-//---------------------
+-------------------------
+:: channels/lines/paths
+-------------------------
+:: scratch work
 
-// send a channel packet... 
-// need a line to remote...
 
-// get the lineSession from the lineMap
-// return the line
-//
-// or
-//
-// create a new lineSession
-    // create and send an open (localLine)
-
-    // wait.  or, have central state to indicate status, and allow for decoupled routing
-
-    // accept an open (remoteLine)
-        // match to the in-progress line session initialization
-
-// add it to the lineMap
-// return the line
+switch.send(channelMsg(json), channelType, remoteHashname)
 
 
 
-type lineHalf struct {
-    id     [16]byte
-    at     int
-    secret [32]byte
+
+
+type channelMap map[?]channel
 }
 
-type lineSession struct {
-    local         lineHalf
-    remote        lineHalf
-    encryptionKey [32]byte
-    decryptionKey [32]byte
+(cm *channelMap) getChannel() {
+    // mutex?
 }
+
+type channel struct {
+    id   int
+    type string
+    send chan
+    recv chan
+}
+
+(c *channel) router() {
+    select {
+    case msg <-c.recv:
+    case msg <-c.send:
+    default:
+    }
+}
+
+(c *channel) start() {
+    go c.router()
+}
+
+
+var cm channelMap
+var c  channel
+
+c := cm.getChannel()
+    // get existing channel or create new channel
+    // point of syncronization for channel map
+    // return empty channel, so it won't block?
+    c.start()
+    return c
+    
+c.send <- message
+    // input channel is point of syncronization for channel
+    // initialize the channel if this is the first message
+
+
+
+
+
+
+type lineMap map[?]line
+
+(lm *lineMap) getLine() {
+    // mutex?
+}
+
+type line struct {
+    id   int
+    ...
+    send chan
+    recv chan
+}
+
+(l *line) router() {
+    select {
+    case msg <-c.recv:
+    case msg <-c.send:
+    default:
+    }
+}
+
+(l *line) start() {
+    go c.router()
+}
+
+var lm lineMap
+var l  line
+
+l := lm.getLine()
+    // get existing line or create new line
+    // point of syncronization for channel map
+    // return empty channel, so it won't block?
+    c.start()
+    return c
+    
+l.send <- message
+    // input channel is point of syncronization for line
+    // initialize the line if this is the first message
+    // ... open ... line
+
+
+
+
+
+
+
+create a new lineSession
+    create and send an open (localLine)
+
+    wait:
+        - have central state to indicate status, and allow for decoupled routing
+        - linesession has an input channel, and waits on the response
+
+    accept an open (remoteLine)
+        match to the in-progress line session initialization
 
 
 func newLocalLine(to string, parts map[string]string, cset cipherSet) {
 
-    //
-    // create a new localLine
-    //
-    // localLine.id -- generate new line id
-    // localLine.at -- generate a new at
-    // localLine.secret -- later...
-    //
-    //
-    // json := make the json (to, from(parts), at, localLineId)
-    // body := cset.publicKey -- needs to be a part of the interface? getPublicKey?
-    // packet := encodePacket(json, body)
-    // openPacketBody, localLineSecret, err := encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte)
-    //
-    // localLine.secret = localLineSecret
-    // 
-    // openPacketJson := ""
-    // openPacketBody := openPacketBody
-    // openPacket := encodePacket(openPacketJson, openPacketBody)
-    //
-    // send...
-    // 
+    create a new localLine
+
+    localLine.id -- generate new line id
+    localLine.at -- generate a new at
+    localLine.secret -- later...
+
+    json := make the json (to, from(parts), at, localLineId)
+    body := cset.publicKey -- needs to be a part of the interface? getPublicKey?
+    packet := encodePacket(json, body)
+    openPacketBody, localLineSecret, err := encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte)
+
+    localLine.secret = localLineSecret
+
+    openPacketJson := ""
+    openPacketBody := openPacketBody
+    openPacket := encodePacket(openPacketJson, openPacketBody)
+
+    send...
 
 }
-
 
 
 
