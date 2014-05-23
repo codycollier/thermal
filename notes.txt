@@ -633,9 +633,8 @@ type line struct {
     ...
 
     // new line management
-    start           chan bool
-    ready           chan bool
-    open            chan packet
+    openLocal       chan bool
+    openRemote      chan packet
 
     // send/recv line packets
     send chan
@@ -645,30 +644,30 @@ type line struct {
 (l *line) router() {
     select {
 
-    case msg <-c.start:
+    case msg <-c.openLocal:
         // create and send an open (localLine)
         l.newLocalLine()
-        c.start = nil
+        c.openLocal = nil
 
-    case msg <-c.open:
+    case msg <-c.openRemote:
         // accept an open (remoteLine)
-        // match to the in-progress line session initialization
-        processOpen()
-            l.newRemoteLine()
-            if needed:
-                l.newLocalLine()
-            c.established = True
-            c.ready = nil
+        l.newRemoteLine()
+        c.openRemote = nil
+
+        // if needed, setup the local line
+        if !c.local:
+            c.openLocal <- True
 
     case msg <-c.send:
-        <-c.ready
-        process
+        go c.process.send(msg)
+        // inside send(), block on initializing
 
     case msg <-c.recv:
-        <-c.ready
-        process
+        go c.process.recv(msg)
 
     default:
+        if c.local and c.remote:
+            close(c.initialzing)
     }
 }
 
