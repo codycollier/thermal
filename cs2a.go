@@ -17,7 +17,7 @@ type cs2a struct {
 	id             string
 	fingerprintBin []byte
 	fingerprintHex string
-	publicKey      []byte
+	publicKey      [32]byte
 	privateKey     rsa.PrivateKey
 	certificate    x509.Certificate
 }
@@ -66,7 +66,7 @@ func (cs *cs2a) initialize() error {
 	cs.id = "cs2a"
 	cs.fingerprintBin = fingerprintBin
 	cs.fingerprintHex = fingerprintHex
-	cs.publicKey = publicKey
+	copy(cs.publicKey[:], publicKey)
 	cs.privateKey = *rsaPrivateKey
 	cs.certificate = *cert
 
@@ -93,6 +93,11 @@ func gen_x509_template() *x509.Certificate {
 // fingerprint will return the csid and fingerprint for use in a 'parts' set
 func (cs *cs2a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
+}
+
+// pubKey returns the cipher set public key
+func (cs *cs2a) pubKey() *[32]byte {
+	return &cs.publicKey
 }
 
 // Stubs for the interface

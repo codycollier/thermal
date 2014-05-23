@@ -8,6 +8,7 @@ import (
 type cipherSet interface {
 	initialize() error
 	fingerprint() (string, string)
+	pubKey() *[32]byte
 
 	encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error)
 	decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error)

@@ -59,6 +59,11 @@ func (cs *cs3a) fingerprint() (string, string) {
 	return cs.id, cs.fingerprintHex
 }
 
+// pubKey returns the cipher set public key
+func (cs *cs3a) pubKey() *[32]byte {
+	return &cs.publicKey
+}
+
 /*
 --------------------------------------------------------------------------------
 The CS3a Open Packet Handshake
