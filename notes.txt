@@ -625,14 +625,31 @@ type lineMap map[?]line
 }
 
 type line struct {
-    id   int
+    remoteHashname  string
+    local           lineHalf
+    remote          lineHalf
+    encryptionKey   [32]byte
+    decryptionKey   [32]byte
     ...
+    // new line management
+    status          empty|initializing|established
+    start chan
+    open chan
+    // send/recv line packets
     send chan
     recv chan
 }
 
 (l *line) router() {
     select {
+    case msg <-c.start:
+        // create and send an open (localLine)
+        c.start = nil
+        l.newLocalLine()
+    case msg <-c.open:
+        // accept an open (remoteLine)
+        // match to the in-progress line session initialization
+        l.newRemoteLine()
     case msg <-c.recv:
     case msg <-c.send:
     default:
@@ -640,46 +657,11 @@ type line struct {
 }
 
 (l *line) start() {
+    c.start <- true
     go c.router()
 }
 
-var lm lineMap
-var l  line
-
-l := lm.getLine()
-    // get existing line or create new line
-    // point of syncronization for channel map
-    // return empty channel, so it won't block?
-    c.start()
-    return c
-    
-l.send <- message
-    // input channel is point of syncronization for line
-    // initialize the line if this is the first message
-    // ... open ... line
-
-
-
-
-
-
-
-
-
-func createNewLine() {
-
-    // create a new lineSession
-    create and send an open (localLine)
-
-    wait:
-        - have central state to indicate status, and allow for decoupled routing
-        - linesession has an input channel, and waits on the response
-
-    accept an open (remoteLine)
-        match to the in-progress line session initialization
-}
-
-func newLocalLine(to string, parts map[string]string, cset cipherSet) {
+(l *line) func newLocalLine(to string, parts map[string]string, cset cipherSet) {
 
     create a new localLine
 
@@ -698,11 +680,27 @@ func newLocalLine(to string, parts map[string]string, cset cipherSet) {
     openPacketBody := openPacketBody
     openPacket := encodePacket(openPacketJson, openPacketBody)
 
-    store partial line in the line map...
+    store partial line data...
     send...
 }
 
+(l *line) func newRemoteLine() {
+}
 
+var lm lineMap
+var l  line
+
+l := lm.getLine()
+    // get existing line or create new line
+    // point of syncronization for channel map
+    // return empty channel, so it won't block?
+    l.start()
+    return l
+    
+l.send <- message
+    // input channel is point of syncronization for line
+    // initialize the line if this is the first message
+    // ... open ... line
 
 
 
