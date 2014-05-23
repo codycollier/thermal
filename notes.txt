@@ -618,7 +618,7 @@ c.send <- message
 
 
 
-type lineMap map[?]line
+type lineMap map[hashname/string]line
 
 (lm *lineMap) func getLine() {
     // mutex?
@@ -631,10 +631,12 @@ type line struct {
     encryptionKey   [32]byte
     decryptionKey   [32]byte
     ...
+
     // new line management
-    status          empty|initializing|established
-    start chan
-    open chan
+    start           chan bool
+    ready           chan bool
+    open            chan packet
+
     // send/recv line packets
     send chan
     recv chan
@@ -642,16 +644,30 @@ type line struct {
 
 (l *line) router() {
     select {
+
     case msg <-c.start:
         // create and send an open (localLine)
-        c.start = nil
         l.newLocalLine()
+        c.start = nil
+
     case msg <-c.open:
         // accept an open (remoteLine)
         // match to the in-progress line session initialization
-        l.newRemoteLine()
-    case msg <-c.recv:
+        processOpen()
+            l.newRemoteLine()
+            if needed:
+                l.newLocalLine()
+            c.established = True
+            c.ready = nil
+
     case msg <-c.send:
+        <-c.ready
+        process
+
+    case msg <-c.recv:
+        <-c.ready
+        process
+
     default:
     }
 }
@@ -694,9 +710,12 @@ l := lm.getLine()
     // get existing line or create new line
     // point of syncronization for channel map
     // return empty channel, so it won't block?
+    l := make(line)
+    l.hashname = ...
     l.start()
     return l
-    
+
+<-l.ready
 l.send <- message
     // input channel is point of syncronization for line
     // initialize the line if this is the first message
