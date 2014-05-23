@@ -78,18 +78,65 @@ type lineSession struct {
 	remote         lineHalf
 	encryptionKey  [32]byte
 	decryptionKey  [32]byte
+	ready          bool
+
+	// open handshakes
+	openLocal  chan bool
+	openRemote chan []byte
+
+	// send/recv of line packets
+	send chan decodedPacket
+	recv chan []byte
 }
 
 // service will listen and respond to open/send/recv messages
 func (line *lineSession) service() {
+
+	for {
+
+		select {
+
+		case <-line.openLocal:
+			//line.newLocalLine()
+
+		case something := <-line.openRemote:
+			//line.openRemote()
+			log.Println(something)
+
+		default:
+			//
+		}
+
+		if line.ready {
+			select {
+			case something := <-line.send:
+				log.Println(something)
+			case something := <-line.recv:
+				log.Println(something)
+			default:
+			}
+		}
+
+	}
 }
 
 // start will setup the line listener
 func (line *lineSession) start() {
+
+	// setup the channels
+	line.openLocal = make(chan bool)
+	line.openRemote = make(chan []byte)
+	line.send = make(chan decodedPacket)
+	line.recv = make(chan []byte)
+
+	// initialization has not completed yet
+	line.ready = false
+	line.openLocal <- true
+
 	go line.service()
 }
 
-// newLocalLine will craft and return an open packet and related data
+// newLocalLine will...
 func (line *lineSession) newLocalLine(to string, parts map[string]string, cset cipherSet) {
 
 	line.local.id = generateLineId()
@@ -123,6 +170,10 @@ func (line *lineSession) newLocalLine(to string, parts map[string]string, cset c
 
 	// todo
 	// return or send
+}
+
+// newRemoteLine will...
+func (line *lineSession) newRemoteLine() {
 }
 
 // generateLineId returns a random 16 char hex encoded string
