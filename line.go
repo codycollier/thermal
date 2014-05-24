@@ -44,7 +44,7 @@ func (store *lineStore) service() {
 			line, exists := store.lineMap[request.hashname]
 			if !exists {
 				line := new(lineSession)
-				line.start()
+				line.start(request.hashname)
 				store.lineMap[request.hashname] = line
 			}
 			request.response <- line
@@ -73,20 +73,20 @@ type lineHalf struct {
 
 // A lineSession represents a telehash Line between two switches
 type lineSession struct {
-	remoteHashname string
-	local          lineHalf
-	remote         lineHalf
-	encryptionKey  [32]byte
-	decryptionKey  [32]byte
-	ready          bool
+	cset            cipherSet
+	remoteHashname  string
+	remotePublicKey *[32]byte
 
-	// open handshakes
+	local         lineHalf
+	remote        lineHalf
+	encryptionKey [32]byte
+	decryptionKey [32]byte
+
+	ready      bool
 	openLocal  chan bool
 	openRemote chan []byte
-
-	// send/recv of line packets
-	send chan decodedPacket
-	recv chan []byte
+	send       chan decodedPacket
+	recv       chan []byte
 }
 
 // service will listen and respond to open/send/recv messages
@@ -121,7 +121,15 @@ func (line *lineSession) service() {
 }
 
 // start will setup the line listener
-func (line *lineSession) start() {
+func (line *lineSession) start(remoteHashname string) {
+
+	// set some line vars
+	// todo - where to get the cset and remotePublickKey?
+	//		get the public key for a remote hashname from...
+	//		maybe pass them in with the storeRequest()
+	line.cset = cset
+	line.remoteHashname = remoteHashname
+	line.remotePublicKey = remotePublicKey
 
 	// setup the channels
 	line.openLocal = make(chan bool)
@@ -137,21 +145,20 @@ func (line *lineSession) start() {
 }
 
 // newLocalLine will...
-func (line *lineSession) newLocalLine(to string, parts map[string]string, cset cipherSet) {
+func (line *lineSession) newLocalLine() {
 
 	line.local.id = generateLineId()
 	line.local.at = generateLineAt()
 
 	// todo
-	// get the hashname's public key
-	remotePublicKey := new([32]byte)
-
-	// todo
 	// json := make the json (to, from(parts), at, localLineId)
+	// to == remoteHashname
+	// parts will be retrieved over in the openMaker()?
+	// lin.local.id
 	json := "{}"
-	body := cset.pubKey()[:]
+	body := line.cset.pubKey()[:]
 	packet, err := encodePacket(json, body)
-	openPacketBody, localLineSecret, err := cset.encryptOpenPacketBody(packet, remotePublicKey)
+	openPacketBody, localLineSecret, err := line.cset.encryptOpenPacketBody(packet, line.remotePublicKey)
 	if err != nil {
 		log.Printf("Error encrypting open packet body (err: %s)", err)
 		return
@@ -160,7 +167,9 @@ func (line *lineSession) newLocalLine(to string, parts map[string]string, cset c
 	line.local.secret = localLineSecret
 
 	// todo
-	openPacketJson := "{}"
+	// the head needs to be a single byte, representing the csid
+	// the encodePacket() function is not setup to handle that as-is
+	openPacketJson := ""
 	openPacket, err := encodePacket(openPacketJson, openPacketBody)
 	if err != nil {
 		log.Printf("Error encoding open packet (err: %s)", err)
