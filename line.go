@@ -127,9 +127,9 @@ func (line *lineSession) start(remoteHashname string) {
 	// todo - where to get the cset and remotePublickKey?
 	//		get the public key for a remote hashname from...
 	//		maybe pass them in with the storeRequest()
-	line.cset = cset
 	line.remoteHashname = remoteHashname
-	line.remotePublicKey = remotePublicKey
+	//line.cset = cset
+	//line.remotePublicKey = remotePublicKey
 
 	// setup the channels
 	line.openLocal = make(chan bool)
