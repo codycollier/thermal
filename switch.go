@@ -1,14 +1,24 @@
 package thermal
 
 import (
+	"fmt"
 	"log"
 )
 
 // Switch provides an api to create, manage, and use a Telehash switch instance
 type Switch struct {
-	hashname string
+	Hashname string
+
+	// the internal backplane of the switch
+	cpack     *cipherPack
+	linestore *lineStore
 }
 
+func (s *Switch) String() string {
+	return fmt.Sprintf("Switch(%s)", s.Hashname)
+}
+
+// Initialize will setup all the internals of a switch instance
 func (s *Switch) Initialize() error {
 
 	// basic initialization
@@ -19,8 +29,8 @@ func (s *Switch) Initialize() error {
 	log.Println("Starting initialization of cipher sets")
 
 	cpack := make(cipherPack)
-	//cpack["cs2a"] = new(cs2a)
 	cpack["cs3a"] = new(cs3a)
+	cpack["cs2a"] = new(cs2a)
 
 	for csid, cset := range cpack {
 
@@ -38,6 +48,7 @@ func (s *Switch) Initialize() error {
 
 	}
 	log.Println("Finished initialization of cipher sets")
+	s.cpack = &cpack
 
 	// build the hashname for the switch instance
 	log.Println("Starting hashname creation")
@@ -49,13 +60,14 @@ func (s *Switch) Initialize() error {
 	if err != nil {
 		return err
 	}
-	s.hashname = hashname
-	log.Printf("switch hashname: %s", s.hashname)
+	s.Hashname = hashname
+	log.Printf("switch hashname: %s", s.Hashname)
 	log.Println("Finished hashname creation")
 
 	// setup the line storage
 	linestore := new(lineStore)
 	linestore.start()
+	s.linestore = linestore
 
 	// end
 	log.Println("Finished initialization of switch")

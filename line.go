@@ -154,7 +154,7 @@ func (line *lineSession) newLocalLine() {
 	// json := make the json (to, from(parts), at, localLineId)
 	// to == remoteHashname
 	// parts will be retrieved over in the openMaker()?
-	// lin.local.id
+	// line.local.id
 	json := "{}"
 	body := line.cset.pubKey()[:]
 	packet, err := encodePacket(json, body)
