@@ -14,12 +14,12 @@ type Switch struct {
 	linestore *lineStore
 }
 
-func (s *Switch) String() string {
-	return fmt.Sprintf("Switch(%s)", s.Hashname)
+func (sw *Switch) String() string {
+	return fmt.Sprintf("Switch(%s)", sw.Hashname)
 }
 
 // Initialize will setup all the internals of a switch instance
-func (s *Switch) Initialize() error {
+func (sw *Switch) Initialize() error {
 
 	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
@@ -48,7 +48,7 @@ func (s *Switch) Initialize() error {
 
 	}
 	log.Println("Finished initialization of cipher sets")
-	s.cpack = &cpack
+	sw.cpack = &cpack
 
 	// build the hashname for the switch instance
 	log.Println("Starting hashname creation")
@@ -60,14 +60,14 @@ func (s *Switch) Initialize() error {
 	if err != nil {
 		return err
 	}
-	s.Hashname = hashname
-	log.Printf("switch hashname: %s", s.Hashname)
+	sw.Hashname = hashname
+	log.Printf("switch hashname: %s", sw.Hashname)
 	log.Println("Finished hashname creation")
 
 	// setup the line storage
 	linestore := new(lineStore)
-	linestore.start()
-	s.linestore = linestore
+	linestore.start(sw)
+	sw.linestore = linestore
 
 	// end
 	log.Println("Finished initialization of switch")

@@ -7,34 +7,26 @@ import (
 	"time"
 )
 
-//-----------------------------------------------------------------------------
-// Router
-// The router helps decouple lines from channels and paths.
-//-----------------------------------------------------------------------------
-
 // routeToLine will route packets to their appropriate line
 func routeToLine() {
 }
 
 //-----------------------------------------------------------------------------
 // Line Store
-// The line store is a service which manages the mapping of remote switches
-// to lines.
+// The line store is a service which manages access to lines
 //-----------------------------------------------------------------------------
 
-// The storeRequest represents requests for lines
-type storeRequest struct {
+type lineStoreRequest struct {
 	hashname string
 	response chan *lineSession
 }
 
-// The lineStore holds and manages the lines
 type lineStore struct {
+	sw      *Switch
 	lineMap map[string]*lineSession
-	request chan *storeRequest
+	request chan *lineStoreRequest
 }
 
-// The service func listens and handles incoming requests
 func (store *lineStore) service() {
 	for {
 		select {
@@ -54,8 +46,8 @@ func (store *lineStore) service() {
 	}
 }
 
-// start will setup the listener to service requests
-func (store *lineStore) start() {
+func (store *lineStore) start(sw *Switch) {
+	store.sw = sw
 	go store.service()
 }
 
@@ -64,18 +56,16 @@ func (store *lineStore) start() {
 // Representation and logic for telehash lines
 //-----------------------------------------------------------------------------
 
-// A lineHalf is one half (local or remote) of a Line
 type lineHalf struct {
 	id     string
 	at     int64
 	secret [32]byte
 }
 
-// A lineSession represents a telehash Line between two switches
 type lineSession struct {
-	cset            cipherSet
 	remoteHashname  string
 	remotePublicKey *[32]byte
+	cset            cipherSet
 
 	local         lineHalf
 	remote        lineHalf
@@ -89,7 +79,6 @@ type lineSession struct {
 	recv       chan []byte
 }
 
-// service will listen and respond to open/send/recv messages
 func (line *lineSession) service() {
 
 	for {
@@ -120,7 +109,6 @@ func (line *lineSession) service() {
 	}
 }
 
-// start will setup the line listener
 func (line *lineSession) start(remoteHashname string) {
 
 	// set some line vars
@@ -144,7 +132,6 @@ func (line *lineSession) start(remoteHashname string) {
 	go line.service()
 }
 
-// newLocalLine will...
 func (line *lineSession) newLocalLine() {
 
 	line.local.id = generateLineId()
@@ -181,7 +168,6 @@ func (line *lineSession) newLocalLine() {
 	// return or send
 }
 
-// newRemoteLine will...
 func (line *lineSession) newRemoteLine() {
 }
 
