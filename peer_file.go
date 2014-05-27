@@ -57,9 +57,7 @@ import (
 
 */
 
-type peerLoader1 map[string]peerLoader2
-
-type peerLoader2 struct {
+type peerLoader map[string]struct {
 	Admin string
 	Paths []pathLoader
 	Parts map[string]string
@@ -76,7 +74,7 @@ type pathLoader struct {
 func loadPeersFromString(peerlist string) []peerSwitch {
 
 	var peers []peerSwitch
-	var peerloader peerLoader1
+	var peerloader peerLoader
 
 	// unpack each 'seed' in to a peer struct
 	json.Unmarshal([]byte(peerlist), &peerloader)
