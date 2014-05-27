@@ -12,6 +12,7 @@ type Switch struct {
 	// the internal backplane of the switch
 	cpack     *cipherPack
 	linestore *lineStore
+	peers     *peerStore
 }
 
 func (sw *Switch) String() string {
@@ -69,7 +70,12 @@ func (sw *Switch) Initialize() error {
 	linestore.start(sw)
 	sw.linestore = linestore
 
-	// end
+	// setup the peer storage
+	peerstore := new(peerStore)
+	peerstore.start(sw)
+	sw.peerstore = peerstore
+
+	// done
 	log.Println("Finished initialization of switch")
 	log.Println("Switch ready")
 	return nil
