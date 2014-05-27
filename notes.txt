@@ -8,15 +8,16 @@
 
 next/current items:
 
+. loading seeds
+
 IP . switching logic
 
 . building a line session
 . line session management
 . channel design and interaction with lines
 
-. loading seeds
-. saving/loading switch state
 
+. saving/loading switch state
 
 
 

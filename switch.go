@@ -12,7 +12,7 @@ type Switch struct {
 	// the internal backplane of the switch
 	cpack     *cipherPack
 	linestore *lineStore
-	peers     *peerStore
+	peerstore *peerStore
 }
 
 func (sw *Switch) String() string {
