@@ -13,8 +13,11 @@ func exercise() {
 	start := time.Now()
 	log.Println("Starting exercise")
 
+	seedsPath := "./seeds-test.json"
+	hintsFile := ""
+
 	s := new(thermal.Switch)
-	s.Initialize()
+	s.Initialize(seedsPath, hintsFile)
 	log.Printf("Switch instance created: %s", s)
 
 	log.Printf("switch hashname: %s", s.Hashname)

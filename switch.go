@@ -20,7 +20,7 @@ func (sw *Switch) String() string {
 }
 
 // Initialize will setup all the internals of a switch instance
-func (sw *Switch) Initialize() error {
+func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 
 	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
@@ -31,7 +31,7 @@ func (sw *Switch) Initialize() error {
 
 	cpack := make(cipherPack)
 	cpack["cs3a"] = new(cs3a)
-	cpack["cs2a"] = new(cs2a)
+	//cpack["cs2a"] = new(cs2a)
 
 	for csid, cset := range cpack {
 
@@ -74,6 +74,18 @@ func (sw *Switch) Initialize() error {
 	peerstore := new(peerStore)
 	peerstore.start(sw)
 	sw.peerstore = peerstore
+
+	// load the seeds and hints files
+	peerSeeds, err := loadPeersFile(seedsPath, "seed")
+	if err != nil {
+		return err
+	}
+	peerHints, err := loadPeersFile(hintsPath, "hint")
+	if err != nil {
+		return err
+	}
+	_ = peerSeeds
+	_ = peerHints
 
 	// done
 	log.Println("Finished initialization of switch")

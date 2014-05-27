@@ -1,13 +1,5 @@
-package thermal
-
-import (
-	"testing"
-)
-
-// variation of seeds.json from telehash-c project
-var seedsList1 = `
 {
-    "dca549c98b94197e79dfa2a7e4ad2e74fb144cda3f4710d4f40e2c75d975272e": {
+    "11111111111111111111111114ad2e74fb144cda3f4710d4f40e2c75d975272e": {
         "paths": [
             {
                 "type": "http",
@@ -35,7 +27,7 @@ var seedsList1 = `
             "1a": "z6yCAC7r5XIr6C4xdxeX7RlSmGu9Xe73L1gv8qecm4/UEZAKR5iCxA=="
         }
     },
-    "11111111dca549c98b94197e79dfa2a7e4ad2e74fb144cda3f4710d4f40e2c75d975272e": {
+    "22222222222222222222222224ad2e74fb144cda3f4710d4f40e2c75d975272e": {
         "paths": [
             {
                 "type": "ipv4",
@@ -50,14 +42,4 @@ var seedsList1 = `
             "3a": "MC5dfSfrAVCSugX75JbgVWtvCbxPqwLDUkc9TcS/qxE="
         }
     }
-}
-`
-
-func TestLoadPeersFromJson(t *testing.T) {
-
-	peers := loadPeersFromJson([]byte(seedsList1))
-	for _, peer := range peers {
-		t.Logf("peer: %s", peer)
-	}
-
 }
