@@ -46,14 +46,15 @@ func loadPeersFromJson(peerjson []byte) []peerSwitch {
 func loadPeersFile(peersFile, peerType string) ([]peerSwitch, error) {
 
 	var peers []peerSwitch
-	var err error
 
-	peersJson, err := ioutil.ReadFile(peersFile)
-	if err != nil {
-		log.Printf("Error reading file (%s) (err: %s)", peersFile, err)
-		return peers, err
+	if peersFile != "" {
+		peersJson, err := ioutil.ReadFile(peersFile)
+		if err != nil {
+			log.Printf("Error reading file (%s) (err: %s)", peersFile, err)
+			return peers, err
+		}
+		peers = loadPeersFromJson(peersJson)
 	}
-	peers = loadPeersFromJson(peersJson)
 
 	return peers, nil
 }
