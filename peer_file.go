@@ -50,7 +50,7 @@ func loadPeersFile(peersFile, peerType string) ([]peerSwitch, error) {
 	if peersFile != "" {
 		peersJson, err := ioutil.ReadFile(peersFile)
 		if err != nil {
-			log.Printf("Error reading file (%s) (err: %s)", peersFile, err)
+			log.Printf("Error reading file (err: %s)", err)
 			return peers, err
 		}
 		peers = loadPeersFromJson(peersJson)
