@@ -14,7 +14,8 @@ func exercise() {
 	log.Println("Starting exercise")
 
 	seedsPath := "./seeds-test.json"
-	hintsPath := "./no-such-file"
+	hintsPath := ""
+	//hintsPath := "./no-such-file"
 
 	s := new(thermal.Switch)
 	s.Initialize(seedsPath, hintsPath)
