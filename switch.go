@@ -78,11 +78,11 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 	// load the seeds and hints files
 	peerSeeds, err := loadPeersFile(seedsPath, "seed")
 	if err != nil {
-		log.Printf("Error loading seeds")
+		log.Printf("Error loading seeds (%s)", peerSeeds)
 	}
 	peerHints, err := loadPeersFile(hintsPath, "hint")
 	if err != nil {
-		log.Printf("Error loading hints")
+		log.Printf("Error loading hints (%s)", peerHints)
 	}
 	_ = peerSeeds
 	_ = peerHints
