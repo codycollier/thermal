@@ -66,8 +66,8 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 	log.Println("Finished hashname creation")
 
 	// Save identity file?
-	//idfile := fmt.Sprintf("./%s.id", hashname)
-	//writeIdentityFile(idfile, &cpack)
+	idfile := fmt.Sprintf("./%s.id", hashname)
+	writeIdentityFile(idfile, &cpack)
 
 	// setup the line storage
 	linestore := new(lineStore)
