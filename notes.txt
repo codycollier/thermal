@@ -8,8 +8,8 @@
 
 next/current items:
 
-. loading seeds
-
+IP . loading seeds and hints
+IP . identity persistence
 IP . switching logic
 
 . building a line session
