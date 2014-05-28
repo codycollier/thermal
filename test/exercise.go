@@ -27,4 +27,5 @@ func exercise() {
 
 func main() {
 	exercise()
+	panic("")
 }
