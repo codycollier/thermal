@@ -1,6 +1,8 @@
 package thermal
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -57,4 +59,29 @@ func loadPeersFile(peersFile, peerType string) ([]peerSwitch, error) {
 	}
 
 	return peers, nil
+}
+
+//
+func writeIdentityFile(idFileName string, cpack *cipherPack) error {
+
+	gob.Register(cipherPack{})
+	gob.Register(cs2a{})
+	gob.Register(cs3a{})
+
+	var encodedFileData bytes.Buffer
+	enc := gob.NewEncoder(&encodedFileData)
+
+	err := enc.Encode(cpack)
+	if err != nil {
+		log.Printf("Error encoding data (err: %s)", err)
+		return err
+	}
+
+	err = ioutil.WriteFile(idFileName, encodedFileData.Bytes(), 0644)
+	if err != nil {
+		log.Printf("Error writing file (file: %s) (err: %s)", idFileName, err)
+		return err
+	}
+
+	return nil
 }
