@@ -20,18 +20,34 @@ func (sw *Switch) String() string {
 }
 
 // Initialize will setup all the internals of a switch instance
-func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
+func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 
+	var err error
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	log.Println("Starting initialization of switch")
 
-	log.Println("Starting initialization of cipher sets")
-	err := sw.newCipherPack()
-	if err != nil {
-		return err
+	if idFile != "" {
+		// Read in a pre-existing identity / cipherPack
+		log.Println("Reading in pre-existing cipher pack")
+		cpack := make(cipherPack)
+		sw.cpack = &cpack
+		readIdentityFile(idFile, sw.cpack)
+		for csid, cset := range *sw.cpack {
+			_, fingerprint := cset.fingerprint()
+			log.Printf("       csid: %s\n", csid)
+			log.Printf("fingerprint: %s\n", fingerprint)
+		}
+
+	} else {
+		// Generate a new cipherPack
+		log.Println("Starting initialization of new cipher pack")
+		err = sw.newCipherPack()
+		if err != nil {
+			return err
+		}
 	}
 
-	log.Println("Starting initialization of cipher sets")
+	log.Println("Generating hashname from cipher pack")
 	err = sw.newHashname()
 	if err != nil {
 		return err
@@ -39,15 +55,6 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 
 	idfile := fmt.Sprintf("./%s.id", sw.Hashname)
 	writeIdentityFile(idfile, sw.cpack)
-
-	// debug
-	//log.Println("Reading in identity file")
-	//readIdentityFile(idfile, sw.cpack)
-	//for csid, cset := range *sw.cpack {
-	//	_, fingerprint := cset.fingerprint()
-	//	log.Printf("       csid: %s\n", csid)
-	//	log.Printf("fingerprint: %s\n", fingerprint)
-	//}
 
 	sw.initializeStores()
 	sw.loadPeers(seedsPath, hintsPath)
@@ -116,16 +123,16 @@ func (sw *Switch) initializeStores() {
 }
 
 // loadPeers loads any available seeds and hints from file
-func (sw *Switch) loadPeers(seedsPath, hintsPath string) {
+func (sw *Switch) loadPeers(seedsFile, hintsFile string) {
 
 	// load the seeds and hints files
-	peerSeeds, err := loadPeersFile(seedsPath, "seed")
+	peerSeeds, err := loadPeersFile(seedsFile, "seed")
 	if err != nil {
-		log.Printf("Error loading seeds (%s)", seedsPath)
+		log.Printf("Error loading seeds (%s)", seedsFile)
 	}
-	peerHints, err := loadPeersFile(hintsPath, "hint")
+	peerHints, err := loadPeersFile(hintsFile, "hint")
 	if err != nil {
-		log.Printf("Error loading hints (%s)", hintsPath)
+		log.Printf("Error loading hints (%s)", hintsFile)
 	}
 	_ = peerSeeds
 	_ = peerHints

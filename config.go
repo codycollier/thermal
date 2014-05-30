@@ -65,8 +65,8 @@ func loadPeersFile(peersFile, peerType string) ([]peerSwitch, error) {
 func writeIdentityFile(idFileName string, cpack *cipherPack) error {
 
 	gob.Register(cipherPack{})
-	gob.Register(cs2a{})
-	gob.Register(cs3a{})
+	gob.Register(&cs3a{})
+	gob.Register(&cs2a{})
 
 	var encodedFileData bytes.Buffer
 	enc := gob.NewEncoder(&encodedFileData)
@@ -90,8 +90,8 @@ func writeIdentityFile(idFileName string, cpack *cipherPack) error {
 func readIdentityFile(idFileName string, cpack *cipherPack) error {
 
 	gob.Register(cipherPack{})
-	gob.Register(cs2a{})
-	gob.Register(cs3a{})
+	gob.Register(&cs3a{})
+	gob.Register(&cs2a{})
 
 	//var encodedFileData bytes.Buffer
 	var encodedFileData []byte
