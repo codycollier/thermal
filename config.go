@@ -85,3 +85,29 @@ func writeIdentityFile(idFileName string, cpack *cipherPack) error {
 
 	return nil
 }
+
+//
+func readIdentityFile(idFileName string, cpack *cipherPack) error {
+
+	gob.Register(cipherPack{})
+	gob.Register(cs2a{})
+	gob.Register(cs3a{})
+
+	//var encodedFileData bytes.Buffer
+	var encodedFileData []byte
+
+	encodedFileData, err := ioutil.ReadFile(idFileName)
+	if err != nil {
+		log.Printf("Error reading file (file: %s) (err: %s)", idFileName, err)
+		return err
+	}
+
+	dec := gob.NewDecoder(bytes.NewReader(encodedFileData))
+	err = dec.Decode(cpack)
+	if err != nil {
+		log.Printf("Error decoding data (err: %s)", err)
+		return err
+	}
+
+	return nil
+}

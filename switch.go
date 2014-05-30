@@ -22,12 +22,44 @@ func (sw *Switch) String() string {
 // Initialize will setup all the internals of a switch instance
 func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 
-	// basic initialization
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	log.Println("Starting initialization of switch")
 
-	// setup the cipher sets
 	log.Println("Starting initialization of cipher sets")
+	err := sw.newCipherPack()
+	if err != nil {
+		return err
+	}
+
+	log.Println("Starting initialization of cipher sets")
+	err = sw.newHashname()
+	if err != nil {
+		return err
+	}
+
+	idfile := fmt.Sprintf("./%s.id", sw.Hashname)
+	writeIdentityFile(idfile, sw.cpack)
+
+	// debug
+	//log.Println("Reading in identity file")
+	//readIdentityFile(idfile, sw.cpack)
+	//for csid, cset := range *sw.cpack {
+	//	_, fingerprint := cset.fingerprint()
+	//	log.Printf("       csid: %s\n", csid)
+	//	log.Printf("fingerprint: %s\n", fingerprint)
+	//}
+
+	sw.initializeStores()
+	sw.loadPeers(seedsPath, hintsPath)
+
+	log.Println("Finished initialization of switch")
+	log.Println("Switch ready")
+	return nil
+
+}
+
+// newCipherPack generates and sets a new cipherPack
+func (sw *Switch) newCipherPack() error {
 
 	cpack := make(cipherPack)
 	cpack["3a"] = new(cs3a)
@@ -50,10 +82,14 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 	}
 	log.Println("Finished initialization of cipher sets")
 	sw.cpack = &cpack
+	return nil
+}
 
-	// build the hashname for the switch instance
+// newHashname generates and sets a new local hashname
+func (sw *Switch) newHashname() error {
+
 	log.Println("Starting hashname creation")
-	parts, err := extractParts(&cpack)
+	parts, err := extractParts(sw.cpack)
 	if err != nil {
 		return err
 	}
@@ -64,20 +100,23 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 	sw.Hashname = hashname
 	log.Printf("switch hashname: %s", sw.Hashname)
 	log.Println("Finished hashname creation")
+	return nil
+}
 
-	// Save identity file?
-	idfile := fmt.Sprintf("./%s.id", hashname)
-	writeIdentityFile(idfile, &cpack)
+// initStores sets up the backplane storage
+func (sw *Switch) initializeStores() {
 
-	// setup the line storage
 	linestore := new(lineStore)
 	linestore.start(sw)
 	sw.linestore = linestore
 
-	// setup the peer storage
 	peerstore := new(peerStore)
 	peerstore.start(sw)
 	sw.peerstore = peerstore
+}
+
+// loadPeers loads any available seeds and hints from file
+func (sw *Switch) loadPeers(seedsPath, hintsPath string) {
 
 	// load the seeds and hints files
 	peerSeeds, err := loadPeersFile(seedsPath, "seed")
@@ -90,10 +129,5 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 	}
 	_ = peerSeeds
 	_ = peerHints
-
-	// done
-	log.Println("Finished initialization of switch")
-	log.Println("Switch ready")
-	return nil
 
 }
