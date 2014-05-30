@@ -72,28 +72,31 @@ func Test3aGobEncodeAndDecode(t *testing.T) {
 		t.Fail()
 	}
 
-	if csetB.csid() != csetA.csid() {
-		t.Logf("csetA: csid: %x", csetA.csid())
-		t.Logf("csetB: csid: %x", csetB.csid())
+	if csetB.id != csetA.id {
+		t.Logf("csetA: id: %x", csetA.id)
+		t.Logf("csetB: id: %x", csetB.id)
 		t.Logf("Data corrupted during encoding and decoding (id)")
 		t.Fail()
 	}
 
-	idA, fingerPrintA := csetA.fingerprint()
-	idB, fingerPrintB := csetB.fingerprint()
-	if fingerPrintB != fingerPrintA {
-		t.Logf("csetA: fingerprint: %s :: %s", idA, fingerPrintA)
-		t.Logf("csetB: fingerprint: %s :: %s", idB, fingerPrintB)
-		t.Logf("Data corrupted during encoding and decoding (fingerprint)")
+	if bytes.Compare(csetB.fingerprintBin, csetA.fingerprintBin) != 0 {
+		t.Logf("csetA: fingerprintBin: %x", csetA.fingerprintBin)
+		t.Logf("csetB: fingerprintBin: %x", csetB.fingerprintBin)
+		t.Logf("Data corrupted during encoding and decoding (fingerprintBin)")
 		t.Fail()
 	}
 
-	pubKeyA := csetA.pubKey()
-	pubKeyB := csetB.pubKey()
-	if &pubKeyA != &pubKeyB {
-		t.Logf("csetA: pubKey: %x", &pubKeyA)
-		t.Logf("csetB: pubKey: %x", &pubKeyB)
-		t.Logf("Data corrupted during encoding and decoding (pubKey)")
+	if csetB.publicKey != csetA.publicKey {
+		t.Logf("csetA: publicKey: %x", csetA.publicKey)
+		t.Logf("csetB: publicKey: %x", csetB.publicKey)
+		t.Logf("Data corrupted during encoding and decoding (publicKey)")
+		t.Fail()
+	}
+
+	if csetB.privateKey != csetA.privateKey {
+		t.Logf("csetA: privateKey: %x", csetA.privateKey)
+		t.Logf("csetB: privateKey: %x", csetB.privateKey)
+		t.Logf("Data corrupted during encoding and decoding (privateKey)")
 		t.Fail()
 	}
 }
