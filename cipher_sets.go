@@ -7,6 +7,7 @@ import (
 // The cipherSet interface defines behavior expected from a cipher set plugin
 type cipherSet interface {
 	initialize() error
+	csid() [1]byte
 	fingerprint() (string, string)
 	pubKey() *[32]byte
 

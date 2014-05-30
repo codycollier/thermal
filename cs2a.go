@@ -16,20 +16,10 @@ import (
 // cs2a is an implementation of the cipher set 2a
 type cs2a struct {
 	id             [1]byte
-	fingerprintBin []byte
-	fingerprintHex string
 	publicKey      [32]byte
 	privateKey     rsa.PrivateKey
+	fingerprintBin []byte
 	certificate    x509.Certificate
-}
-
-func (cs *cs2a) String() string {
-	return fmt.Sprintf("%x: %x", cs.id, cs.fingerprint)
-}
-
-// csid will return the id of the cipher set
-func (cs *cs2a) csid() string {
-	return fmt.Sprintf("%x", cs.id)
 }
 
 // init will generate a key pair and initialize the cipher set
@@ -61,13 +51,11 @@ func (cs *cs2a) initialize() error {
 	hash256 := sha256.New()
 	hash256.Write(publicKey[:])
 	fingerprintBin := hash256.Sum(nil)
-	fingerprintHex := fmt.Sprintf("%x", fingerprintBin)
 
 	// initialize the struct
 	csid_byte, _ := hex.DecodeString("3a")
 	copy(cs.id[:], csid_byte[:])
 	cs.fingerprintBin = fingerprintBin
-	cs.fingerprintHex = fingerprintHex
 	copy(cs.publicKey[:], publicKey)
 	cs.privateKey = *rsaPrivateKey
 	cs.certificate = *cert
@@ -92,9 +80,17 @@ func gen_x509_template() *x509.Certificate {
 	return cert
 }
 
+func (cs *cs2a) String() string {
+	return fmt.Sprintf("%x: %x", cs.id, cs.fingerprint)
+}
+
+func (cs *cs2a) csid() [1]byte {
+	return cs.id
+}
+
 // fingerprint will return the csid and fingerprint for use in a 'parts' set
 func (cs *cs2a) fingerprint() (string, string) {
-	return cs.csid(), cs.fingerprintHex
+	return fmt.Sprintf("%x", cs.id), fmt.Sprintf("%x", cs.fingerprintBin)
 }
 
 // pubKey returns the cipher set public key

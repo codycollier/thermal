@@ -34,13 +34,13 @@ func (cs *cs3a) initialize() error {
 	hash256 := sha256.New()
 	hash256.Write(publicKey[:])
 	fingerprintBin := hash256.Sum(nil)
-	fingerprintHex := fmt.Sprintf("%x", fingerprintBin)
+
+	// generate the single byte representation of the cipher set
+	csid_byte, _ := hex.DecodeString("3a")
 
 	// initialize the struct
-	csid_byte, _ := hex.DecodeString("3a")
 	copy(cs.id[:], csid_byte[:])
 	cs.fingerprintBin = fingerprintBin
-	cs.fingerprintHex = fingerprintHex
 	cs.publicKey = *publicKey
 	cs.privateKey = *privateKey
 
@@ -49,16 +49,16 @@ func (cs *cs3a) initialize() error {
 }
 
 func (cs *cs3a) String() string {
-	return fmt.Sprintf("%x: %x", cs.id, cs.fingerprint)
+	return fmt.Sprintf("%x: %x", cs.id, cs.fingerprintBin)
 }
 
-func (cs *cs3a) csid() string {
-	return fmt.Sprintf("%x", cs.id)
+func (cs *cs3a) csid() [1]byte {
+	return cs.id
 }
 
 // fingerprint returns the csid and fingerprint for use in a 'parts' set
 func (cs *cs3a) fingerprint() (string, string) {
-	return cs.csid(), cs.fingerprintHex
+	return fmt.Sprintf("%x", cs.id), fmt.Sprintf("%x", cs.fingerprintBin)
 }
 
 // pubKey returns the cipher set public key
@@ -68,8 +68,31 @@ func (cs *cs3a) pubKey() *[32]byte {
 
 /*
 --------------------------------------------------------------------------------
+gob encoding/decoding
+
+
+
+
+
+--------------------------------------------------------------------------------
+*/
+
+// GobEncode implements the GobEncoder interface and allows for persisting the cipherset
+func (cs *cs3a) GobEncode() ([]byte, error) {
+
+	var encoded_cset []byte
+
+	encoded_cset = append(encoded_cset, cs.id[:]...)
+	encoded_cset = append(encoded_cset, cs.publicKey[:]...)
+	encoded_cset = append(encoded_cset, cs.privateKey[:]...)
+
+	return encoded_cset, nil
+
+}
+
+/*
+--------------------------------------------------------------------------------
 The CS3a Open Packet Handshake
----------------------------------
 
 The cs3a encryption & decryption of an inner open packet, from the perspective
 of the sender and receiver:
@@ -173,6 +196,13 @@ func (cs *cs3a) decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[3
 	return packet, remoteLineSecret, nil
 }
 
+/*
+--------------------------------------------------------------------------------
+The CS3a Line Packet encryption
+
+--------------------------------------------------------------------------------
+*/
+
 // generateLineEncryptionKey returns a key suitable for outgoing line packet encryption
 func (cs *cs3a) generateLineEncryptionKey(localLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
 
@@ -234,17 +264,4 @@ func (cs *cs3a) decryptLinePacketBody(linePacketBody []byte, lineDecryptionKey *
 	}
 
 	return packet, nil
-}
-
-// GobEncode implements the GobEncoder interface and allows for persisting the cipherset
-func (cs *cs3a) GobEncode() ([]byte, error) {
-
-	var encoded_cset []byte
-
-	encoded_cset = append(encoded_cset, cs.id[:]...)
-	encoded_cset = append(encoded_cset, cs.publicKey[:]...)
-	encoded_cset = append(encoded_cset, cs.privateKey[:]...)
-
-	return encoded_cset, nil
-
 }

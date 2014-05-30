@@ -3,6 +3,7 @@ package thermal
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/hex"
 	"testing"
 )
 
@@ -22,7 +23,8 @@ func Test3aCsid(t *testing.T) {
 	cset := new(cs3a)
 	cset.initialize()
 	csid := cset.csid()
-	if csid != "3a" {
+	csid_hex := hex.EncodeToString(csid[:])
+	if csid_hex != "3a" {
 		t.Fail()
 	}
 }
