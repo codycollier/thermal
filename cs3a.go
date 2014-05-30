@@ -66,16 +66,9 @@ func (cs *cs3a) pubKey() *[32]byte {
 	return &cs.publicKey
 }
 
-/*
---------------------------------------------------------------------------------
-gob encoding/decoding
-
-
-
-
-
---------------------------------------------------------------------------------
-*/
+//--------------------------------------------------------------------------------
+// gob encoding/decoding
+//--------------------------------------------------------------------------------
 
 // GobEncode implements the GobEncoder interface and allows for persisting the cipherset
 func (cs *cs3a) GobEncode() ([]byte, error) {
@@ -90,27 +83,25 @@ func (cs *cs3a) GobEncode() ([]byte, error) {
 
 }
 
-/*
---------------------------------------------------------------------------------
-The CS3a Open Packet Handshake
-
-The cs3a encryption & decryption of an inner open packet, from the perspective
-of the sender and receiver:
-
-Sender:
-box.Precompute(senderLineSecret, receiverPublicKey, senderLinePrivateKey)
-secretbox.Seal(encInnerPacket, packet, &nonce, senderLineSecret)
-
-Receiver:
-box.Precompute(&senderLineSecret, &senderLinePublicKey, &receiverPrivateKey)
-secretbox.Open(packet, encInnerPacket, &nonce, &senderLineSecret)
-
-The sender/receiver context helps to highlight the public/private key pairings.
-
-However, the following functions use the context of local switch instance
-and remote switch instance instead.
---------------------------------------------------------------------------------
-*/
+//--------------------------------------------------------------------------------
+// The CS3a Open Packet Handshake
+//
+// The cs3a encryption & decryption of an inner open packet, from the perspective
+// of the sender and receiver:
+//
+// Sender:
+// box.Precompute(senderLineSecret, receiverPublicKey, senderLinePrivateKey)
+// secretbox.Seal(encInnerPacket, packet, &nonce, senderLineSecret)
+//
+// Receiver:
+// box.Precompute(&senderLineSecret, &senderLinePublicKey, &receiverPrivateKey)
+// secretbox.Open(packet, encInnerPacket, &nonce, &senderLineSecret)
+//
+// The sender/receiver context helps to highlight the public/private key pairings.
+//
+// However, the following functions use the context of local switch instance
+// and remote switch instance instead.
+//--------------------------------------------------------------------------------
 
 // encryptOpenPacket returns an assembled open packet body and a local line shared secret
 func (cs *cs3a) encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error) {
@@ -196,12 +187,9 @@ func (cs *cs3a) decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[3
 	return packet, remoteLineSecret, nil
 }
 
-/*
---------------------------------------------------------------------------------
-The CS3a Line Packet encryption
-
---------------------------------------------------------------------------------
-*/
+//--------------------------------------------------------------------------------
+// The CS3a Line Packet encryption
+//--------------------------------------------------------------------------------
 
 // generateLineEncryptionKey returns a key suitable for outgoing line packet encryption
 func (cs *cs3a) generateLineEncryptionKey(localLineSecret *[32]byte, localLineId, remoteLineId *[16]byte) (key [32]byte) {
