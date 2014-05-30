@@ -1,6 +1,7 @@
 package thermal
 
 import (
+	"bytes"
 	"code.google.com/p/go.crypto/nacl/box"
 	"code.google.com/p/go.crypto/nacl/secretbox"
 	"code.google.com/p/go.crypto/poly1305"
@@ -19,7 +20,7 @@ type cs3a struct {
 	fingerprintBin []byte
 }
 
-// initialize generates a key pair and sets up the cipher set
+// initialize generates a key pair and then sets up the cipher set
 func (cs *cs3a) initialize() error {
 
 	// generate the key pair
@@ -28,6 +29,13 @@ func (cs *cs3a) initialize() error {
 		log.Println("Error generating NaCl keypair in cs3a initialization")
 		return err
 	}
+
+	cs.populate(publicKey, privateKey)
+	return nil
+}
+
+// populate takes a generated or loaded key pair and sets up the cipher set
+func (cs *cs3a) populate(publicKey, privateKey *[32]byte) {
 
 	// generate the fingerprint hash
 	hash256 := sha256.New()
@@ -42,9 +50,6 @@ func (cs *cs3a) initialize() error {
 	cs.fingerprintBin = fingerprintBin
 	cs.publicKey = *publicKey
 	cs.privateKey = *privateKey
-
-	return nil
-
 }
 
 func (cs *cs3a) String() string {
@@ -75,14 +80,42 @@ func (cs *cs3a) pubKey() *[32]byte {
 
 func (cs *cs3a) GobEncode() ([]byte, error) {
 
-	var encoded_cset []byte
+	var encodedSet []byte
 
-	encoded_cset = append(encoded_cset, cs.id[:]...)
-	encoded_cset = append(encoded_cset, cs.publicKey[:]...)
-	encoded_cset = append(encoded_cset, cs.privateKey[:]...)
+	encodedSet = append(encodedSet, cs.id[:]...)
+	encodedSet = append(encodedSet, cs.publicKey[:]...)
+	encodedSet = append(encodedSet, cs.privateKey[:]...)
 
-	return encoded_cset, nil
+	return encodedSet, nil
+}
 
+func (cs *cs3a) GobDecode(encodedSet []byte) error {
+
+	var csidByte [1]byte
+	var publicKey [32]byte
+	var privateKey [32]byte
+
+	// unpack and validate
+	if len(encodedSet) != 65 {
+		err := fmt.Errorf("Encoded cset is not of expected size")
+		return err
+	}
+
+	copy(csidByte[:], encodedSet[:1])
+	copy(publicKey[:], encodedSet[1:33])
+	copy(privateKey[:], encodedSet[33:])
+
+	expectedByte, _ := hex.DecodeString("3a")
+	if bytes.Compare(csidByte[:], expectedByte) != 0 {
+		err := fmt.Errorf("Encoded cset is not of expected type")
+		return err
+	}
+
+	// reload the struct
+	copy(cs.id[:], csidByte[:])
+	cs.populate(&publicKey, &privateKey)
+
+	return nil
 }
 
 //--------------------------------------------------------------------------------
@@ -140,7 +173,6 @@ func (cs *cs3a) encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte) 
 	openPacketBody = append(openPacketBody, openPacketData...)
 
 	return openPacketBody, localLineSecret, nil
-
 }
 
 // decryptOpenPacket returns an unencrypted inner open packet and a remote line shared secret

@@ -23,7 +23,7 @@ type cs2a struct {
 	certificate x509.Certificate
 }
 
-// init will generate a key pair and initialize the cipher set
+// init will generate a key pair and setup the cipher set
 func (cs *cs2a) initialize() error {
 
 	// generate the rsa-2048 key pair
@@ -48,21 +48,24 @@ func (cs *cs2a) initialize() error {
 	}
 	publicKey := cert.RawSubjectPublicKeyInfo
 
+	cs.populate(publicKey, rsaPrivateKey)
+	return nil
+}
+
+// populate takes a generated or loaded key pair and sets up the cipher set
+func (cs *cs2a) populate(publicKey []byte, rsaPrivateKey *rsa.PrivateKey) {
+
 	// generate the fingerprint hash
 	hash256 := sha256.New()
 	hash256.Write(publicKey[:])
 	fingerprintBin := hash256.Sum(nil)
 
 	// initialize the struct
-	csid_byte, _ := hex.DecodeString("3a")
+	csid_byte, _ := hex.DecodeString("2a")
 	copy(cs.id[:], csid_byte[:])
 	cs.fingerprintBin = fingerprintBin
 	copy(cs.publicKey[:], publicKey)
 	cs.privateKey = *rsaPrivateKey
-	cs.certificate = *cert
-
-	return nil
-
 }
 
 // Generate a template x509 certificate
