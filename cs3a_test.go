@@ -3,6 +3,7 @@ package thermal
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/gob"
 	"encoding/hex"
 	"testing"
 )
@@ -41,6 +42,65 @@ func Test3aFingerprint(t *testing.T) {
 	}
 
 }
+
+//
+// gob encoding/decoding
+//
+
+func Test3aGobEncodeAndDecode(t *testing.T) {
+
+	gob.Register(cipherPack{})
+	gob.Register(cs2a{})
+	gob.Register(cs3a{})
+
+	var encodedData bytes.Buffer
+	enc := gob.NewEncoder(&encodedData)
+
+	csetA := new(cs3a)
+	csetA.initialize()
+	err := enc.Encode(csetA)
+	if err != nil {
+		t.Logf("Error encoding data (err: %s)", err)
+		t.Fail()
+	}
+
+	dec := gob.NewDecoder(&encodedData)
+	csetB := new(cs3a)
+	err = dec.Decode(csetB)
+	if err != nil {
+		t.Logf("Error decoding data (err: %s)", err)
+		t.Fail()
+	}
+
+	if csetB.csid() != csetA.csid() {
+		t.Logf("csetA: csid: %x", csetA.csid())
+		t.Logf("csetB: csid: %x", csetB.csid())
+		t.Logf("Data corrupted during encoding and decoding (id)")
+		t.Fail()
+	}
+
+	idA, fingerPrintA := csetA.fingerprint()
+	idB, fingerPrintB := csetB.fingerprint()
+	if fingerPrintB != fingerPrintA {
+		t.Logf("csetA: fingerprint: %s :: %s", idA, fingerPrintA)
+		t.Logf("csetB: fingerprint: %s :: %s", idB, fingerPrintB)
+		t.Logf("Data corrupted during encoding and decoding (fingerprint)")
+		t.Fail()
+	}
+
+	pubKeyA := csetA.pubKey()
+	pubKeyB := csetB.pubKey()
+	if &pubKeyA != &pubKeyB {
+		t.Logf("csetA: pubKey: %x", &pubKeyA)
+		t.Logf("csetB: pubKey: %x", &pubKeyB)
+		t.Logf("Data corrupted during encoding and decoding (pubKey)")
+		t.Fail()
+	}
+}
+
+//
+// open handshake
+//
 
 func Test3aEncryptOpenPacketBody(t *testing.T) {
 
@@ -106,6 +166,10 @@ func Test3aEncryptAndDecryptOpenPacketBody(t *testing.T) {
 	}
 
 }
+
+//
+// line packet encryption / decryption
+//
 
 func Test3aGenerateLineEncryptionKey(t *testing.T) {
 
