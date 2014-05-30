@@ -22,7 +22,7 @@ func Test3aCsid(t *testing.T) {
 	cset := new(cs3a)
 	cset.initialize()
 	csid := cset.csid()
-	if csid != "cs3a" {
+	if csid != "3a" {
 		t.Fail()
 	}
 }
@@ -31,7 +31,7 @@ func Test3aFingerprint(t *testing.T) {
 	cset := new(cs3a)
 	cset.initialize()
 	csid, fingerprint := cset.fingerprint()
-	if csid != "cs3a" {
+	if csid != "3a" {
 		t.Fail()
 	}
 	if len(fingerprint) != 64 {

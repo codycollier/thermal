@@ -6,13 +6,14 @@ import (
 	"code.google.com/p/go.crypto/poly1305"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log"
 )
 
 // cs3a is an implementation of the NaCl based cipher set 3a
 type cs3a struct {
-	id             string
+	id             [1]byte
 	fingerprintBin []byte
 	fingerprintHex string
 	publicKey      [32]byte
@@ -36,7 +37,8 @@ func (cs *cs3a) initialize() error {
 	fingerprintHex := fmt.Sprintf("%x", fingerprintBin)
 
 	// initialize the struct
-	cs.id = "cs3a"
+	csid_byte, _ := hex.DecodeString("3a")
+	copy(cs.id[:], csid_byte[:])
 	cs.fingerprintBin = fingerprintBin
 	cs.fingerprintHex = fingerprintHex
 	cs.publicKey = *publicKey
@@ -47,16 +49,16 @@ func (cs *cs3a) initialize() error {
 }
 
 func (cs *cs3a) String() string {
-	return fmt.Sprintf("%s: %x", cs.id, cs.fingerprint)
+	return fmt.Sprintf("%x: %x", cs.id, cs.fingerprint)
 }
 
 func (cs *cs3a) csid() string {
-	return cs.id
+	return fmt.Sprintf("%x", cs.id)
 }
 
 // fingerprint returns the csid and fingerprint for use in a 'parts' set
 func (cs *cs3a) fingerprint() (string, string) {
-	return cs.id, cs.fingerprintHex
+	return cs.csid(), cs.fingerprintHex
 }
 
 // pubKey returns the cipher set public key
@@ -232,4 +234,17 @@ func (cs *cs3a) decryptLinePacketBody(linePacketBody []byte, lineDecryptionKey *
 	}
 
 	return packet, nil
+}
+
+// GobEncode implements the GobEncoder interface and allows for persisting the cipherset
+func (cs *cs3a) GobEncode() ([]byte, error) {
+
+	var encoded_cset []byte
+
+	encoded_cset = append(encoded_cset, cs.id[:]...)
+	encoded_cset = append(encoded_cset, cs.publicKey[:]...)
+	encoded_cset = append(encoded_cset, cs.privateKey[:]...)
+
+	return encoded_cset, nil
+
 }

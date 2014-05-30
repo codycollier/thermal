@@ -30,8 +30,8 @@ func (sw *Switch) Initialize(seedsPath, hintsPath string) error {
 	log.Println("Starting initialization of cipher sets")
 
 	cpack := make(cipherPack)
-	cpack["cs3a"] = new(cs3a)
-	//cpack["cs2a"] = new(cs2a)
+	cpack["3a"] = new(cs3a)
+	//cpack["2a"] = new(cs2a)
 
 	for csid, cset := range cpack {
 

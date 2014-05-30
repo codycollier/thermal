@@ -41,7 +41,7 @@ func TestPartsExtraction(t *testing.T) {
 	testCPack := make(cipherPack)
 	cset := new(cs3a)
 	cset.initialize()
-	testCPack["cs3a"] = cset
+	testCPack["3a"] = cset
 
 	testparts, err := extractParts(&testCPack)
 
@@ -56,8 +56,8 @@ func TestPartsExtraction(t *testing.T) {
 	}
 
 	// the entry value should be a 64 len hex string
-	if len(testparts["cs3a"]) != 64 {
-		t.Logf("Bad fingerprint - testparts[cs3a]: %s\n", testparts["cs3a"])
+	if len(testparts["3a"]) != 64 {
+		t.Logf("Bad fingerprint - testparts[3a]: %s\n", testparts["3a"])
 		t.Fail()
 	}
 
