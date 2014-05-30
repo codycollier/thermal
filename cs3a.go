@@ -14,10 +14,9 @@ import (
 // cs3a is an implementation of the NaCl based cipher set 3a
 type cs3a struct {
 	id             [1]byte
-	fingerprintBin []byte
-	fingerprintHex string
 	publicKey      [32]byte
 	privateKey     [32]byte
+	fingerprintBin []byte
 }
 
 // initialize generates a key pair and sets up the cipher set
@@ -52,6 +51,7 @@ func (cs *cs3a) String() string {
 	return fmt.Sprintf("%x: %x", cs.id, cs.fingerprintBin)
 }
 
+// csid returns the single byte representation of the cipher set type/id
 func (cs *cs3a) csid() [1]byte {
 	return cs.id
 }
@@ -68,9 +68,11 @@ func (cs *cs3a) pubKey() *[32]byte {
 
 //--------------------------------------------------------------------------------
 // gob encoding/decoding
+//
+// These methods implment the gob encoder and decoder interfaces, to allow for
+// persisting the cipherPack (and in essence, the identity) of the local switch.
 //--------------------------------------------------------------------------------
 
-// GobEncode implements the GobEncoder interface and allows for persisting the cipherset
 func (cs *cs3a) GobEncode() ([]byte, error) {
 
 	var encoded_cset []byte
@@ -189,6 +191,9 @@ func (cs *cs3a) decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[3
 
 //--------------------------------------------------------------------------------
 // The CS3a Line Packet encryption
+//
+// Encrypt all channel packets which are outgoing on this line and decrypt all
+// incoming channel packets on this line.
 //--------------------------------------------------------------------------------
 
 // generateLineEncryptionKey returns a key suitable for outgoing line packet encryption

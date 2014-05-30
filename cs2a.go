@@ -19,7 +19,8 @@ type cs2a struct {
 	publicKey      [32]byte
 	privateKey     rsa.PrivateKey
 	fingerprintBin []byte
-	certificate    x509.Certificate
+
+	certificate x509.Certificate
 }
 
 // init will generate a key pair and initialize the cipher set
