@@ -61,14 +61,14 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 	sw.initializeStores()
 
 	if seedsPath != "" {
-		err = sw.loadPeers(seedsPath, "seeds")
+		err = sw.loadPeers(seedsPath, "seed")
 
 		if err != nil {
 			log.Printf("Error loading seeds (%s)", seedsPath)
 		}
 	}
 	if hintsPath != "" {
-		err = sw.loadPeers(hintsPath, "hints")
+		err = sw.loadPeers(hintsPath, "hint")
 		if err != nil {
 			log.Printf("Error loading hints (%s)", hintsPath)
 		}
@@ -143,7 +143,7 @@ func (sw *Switch) loadPeers(peersFile, peersType string) error {
 	peers, err := loadPeersFile(peersFile, peersType)
 	log.Printf("Loaded peers of type %s", peersType)
 	log.Printf("Loaded peers %s", peers)
-	for peer := range peers {
+	for _, peer := range peers {
 		log.Printf("peer: %s", peer)
 	}
 

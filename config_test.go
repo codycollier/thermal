@@ -54,10 +54,18 @@ var seedsList1 = `
 `
 
 func TestLoadPeersFromJson(t *testing.T) {
-
 	peers := loadPeersFromJson([]byte(seedsList1))
 	for _, peer := range peers {
 		t.Logf("peer: %s", peer)
 	}
+}
 
+func TestLoadPeersFile(t *testing.T) {
+	peers, err := loadPeersFile("./test/seeds-test.json", "seed")
+	if err != nil {
+		t.Fail()
+	}
+	for _, peer := range peers {
+		t.Logf("peer: %s", peer)
+	}
 }

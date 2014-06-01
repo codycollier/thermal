@@ -1,19 +1,19 @@
 {
     "c0dbd9479df1fdeb16ae2ef3e5de93d8a5ff54d4d69b7a3e835f96729189ec68": {
-        "admin": "http://github.com/codycollier/thermal",
         "comment": "This is pong",
+        "admin": "http://github.com/codycollier/thermal",
         "paths": [
             {
                 "type": "ipv4",
                 "ip": "127.0.0.1",
                 "port": 23002
-            },
+            }
         ],
         "parts": {
-            "3a": "b695ad975572f6dd5ae1bb441426fbd02cee9b74116468c4d680813d7afec20b",
+            "3a": "b695ad975572f6dd5ae1bb441426fbd02cee9b74116468c4d680813d7afec20b"
         },
         "keys": {
-            "3a": "qI/LYqxz6lqQGza/rpPDITtpX66ijYsUHcqwEoLclWs=",
+            "3a": "qI/LYqxz6lqQGza/rpPDITtpX66ijYsUHcqwEoLclWs="
         }
-    },
+    }
 }

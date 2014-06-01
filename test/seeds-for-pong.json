@@ -1,19 +1,19 @@
 {
     "501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f": {
+        "_comment": "This is ping",
         "admin": "http://github.com/codycollier/thermal",
-        "comment": "This is ping",
         "paths": [
             {
                 "type": "ipv4",
                 "ip": "127.0.0.1",
                 "port": 23001
-            },
+            }
         ],
         "parts": {
-            "3a": "2fc36b1bd5807fbd2bf803a5a64bf91733141e792698b9cfaa21fac76ecd2886",
+            "3a": "2fc36b1bd5807fbd2bf803a5a64bf91733141e792698b9cfaa21fac76ecd2886"
         },
         "keys": {
-            "3a": "la6cKhlVYrXAPBFI50v/8pAQKKUe6FgvxtHyJ2pJGyA=",
+            "3a": "la6cKhlVYrXAPBFI50v/8pAQKKUe6FgvxtHyJ2pJGyA="
         }
-    },
+    }
 }
