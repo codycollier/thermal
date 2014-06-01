@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -101,6 +102,13 @@ func (cs *cs2a) fingerprint() (string, string) {
 func (cs *cs2a) pubKey() *[32]byte {
 	return &cs.publicKey
 }
+
+// pubKeyStr returns the string representation of the cipher set public key
+func (cs *cs2a) pubKeyStr() string {
+	return base64.StdEncoding.EncodeToString(cs.publicKey[:])
+}
+
+// Stubs for the interface
 
 // Stubs for the interface
 

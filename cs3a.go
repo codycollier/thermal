@@ -7,6 +7,7 @@ import (
 	"code.google.com/p/go.crypto/poly1305"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -69,6 +70,11 @@ func (cs *cs3a) fingerprint() (string, string) {
 // pubKey returns the cipher set public key
 func (cs *cs3a) pubKey() *[32]byte {
 	return &cs.publicKey
+}
+
+// pubKeyStr returns the string representation of the cipher set public key
+func (cs *cs3a) pubKeyStr() string {
+	return base64.StdEncoding.EncodeToString(cs.publicKey[:])
 }
 
 //--------------------------------------------------------------------------------

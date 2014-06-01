@@ -10,6 +10,7 @@ type cipherSet interface {
 	csid() [1]byte
 	fingerprint() (string, string)
 	pubKey() *[32]byte
+	pubKeyStr() string
 
 	encryptOpenPacketBody(packet []byte, remotePublicKey *[32]byte) (openPacketBody []byte, localLineSecret [32]byte, err error)
 	decryptOpenPacketBody(openPacketBody []byte, remotePublicKey *[32]byte) (packet []byte, remoteLineSecret [32]byte, err error)

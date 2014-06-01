@@ -34,8 +34,10 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 		readIdentityFile(idFile, sw.cpack)
 		for csid, cset := range *sw.cpack {
 			_, fingerprint := cset.fingerprint()
+			pubkey := cset.pubKeyStr()
 			log.Printf("       csid: %s\n", csid)
 			log.Printf("fingerprint: %s\n", fingerprint)
+			log.Printf(" public_key: %s\n", pubkey)
 		}
 
 	} else {
@@ -57,8 +59,10 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 	writeIdentityFile(idfile, sw.cpack)
 
 	sw.initializeStores()
+
 	if seedsPath != "" {
 		err = sw.loadPeers(seedsPath, "seeds")
+
 		if err != nil {
 			log.Printf("Error loading seeds (%s)", seedsPath)
 		}
@@ -121,7 +125,7 @@ func (sw *Switch) newHashname() error {
 	return nil
 }
 
-// initStores sets up the backplane storage
+// initializeStores sets up the backplane storage
 func (sw *Switch) initializeStores() {
 
 	linestore := new(lineStore)
@@ -133,10 +137,15 @@ func (sw *Switch) initializeStores() {
 	sw.peerstore = peerstore
 }
 
-// loadPeers loads any available seeds and hints from file
+// loadPeers populates the peerstore with pre-existing seeds or hints
 func (sw *Switch) loadPeers(peersFile, peersType string) error {
 
 	peers, err := loadPeersFile(peersFile, peersType)
+	log.Printf("Loaded peers of type %s", peersType)
+	log.Printf("Loaded peers %s", peers)
+	for peer := range peers {
+		log.Printf("peer: %s", peer)
+	}
 
 	if err != nil {
 		return err
