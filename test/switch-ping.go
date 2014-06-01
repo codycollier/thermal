@@ -6,8 +6,7 @@ import (
 	"time"
 )
 
-// exercise will exercise and test the thermal library
-func exercise() {
+func startPing() {
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 
 	start := time.Now()
@@ -26,5 +25,5 @@ func exercise() {
 }
 
 func main() {
-	exercise()
+	startPing()
 }
