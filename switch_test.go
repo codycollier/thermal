@@ -16,7 +16,7 @@ func TestSwitchInit(t *testing.T) {
 	s := new(Switch)
 
 	idFile := ""
-	seedsFile := "./test/seeds-test.json"
+	seedsFile := ""
 	hintsFile := ""
 
 	err := s.Initialize(idFile, seedsFile, hintsFile)

@@ -57,7 +57,18 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 	writeIdentityFile(idfile, sw.cpack)
 
 	sw.initializeStores()
-	sw.loadPeers(seedsPath, hintsPath)
+	if seedsPath != "" {
+		err = sw.loadPeers(seedsPath, "seeds")
+		if err != nil {
+			log.Printf("Error loading seeds (%s)", seedsPath)
+		}
+	}
+	if hintsPath != "" {
+		err = sw.loadPeers(hintsPath, "hints")
+		if err != nil {
+			log.Printf("Error loading hints (%s)", hintsPath)
+		}
+	}
 
 	log.Println("Finished initialization of switch")
 	log.Println("Switch ready")
@@ -123,18 +134,16 @@ func (sw *Switch) initializeStores() {
 }
 
 // loadPeers loads any available seeds and hints from file
-func (sw *Switch) loadPeers(seedsFile, hintsFile string) {
+func (sw *Switch) loadPeers(peersFile, peersType string) error {
 
-	// load the seeds and hints files
-	peerSeeds, err := loadPeersFile(seedsFile, "seed")
+	peers, err := loadPeersFile(peersFile, peersType)
+
 	if err != nil {
-		log.Printf("Error loading seeds (%s)", seedsFile)
+		return err
 	}
-	peerHints, err := loadPeersFile(hintsFile, "hint")
-	if err != nil {
-		log.Printf("Error loading hints (%s)", hintsFile)
-	}
-	_ = peerSeeds
-	_ = peerHints
+
+	_ = peers
+
+	return nil
 
 }
