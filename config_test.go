@@ -61,7 +61,7 @@ func TestLoadPeersFromJson(t *testing.T) {
 }
 
 func TestLoadPeersFile(t *testing.T) {
-	peers, err := loadPeersFile("./test/seeds-test.json", "seed")
+	peers, err := loadPeersFile("./_test/seeds-test.json", "seed")
 	if err != nil {
 		t.Fail()
 	}
