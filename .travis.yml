@@ -1,6 +1,3 @@
 
 language: go
 
-before_script:
-    - rm -rf ./test/
-
