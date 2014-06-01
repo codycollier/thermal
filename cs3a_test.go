@@ -49,10 +49,6 @@ func Test3aFingerprint(t *testing.T) {
 
 func Test3aGobEncodeAndDecode(t *testing.T) {
 
-	gob.Register(cipherPack{})
-	gob.Register(cs2a{})
-	gob.Register(cs3a{})
-
 	var encodedData bytes.Buffer
 	enc := gob.NewEncoder(&encodedData)
 
