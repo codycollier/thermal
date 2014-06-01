@@ -14,7 +14,12 @@ func TestSwitchInit(t *testing.T) {
 
 	log.SetOutput(ioutil.Discard)
 	s := new(Switch)
-	err := s.Initialize("", "")
+
+	idFile := ""
+	seedsFile := "./test/seeds-test.json"
+	hintsFile := ""
+
+	err := s.Initialize(idFile, seedsFile, hintsFile)
 	if err != nil {
 		t.Fail()
 	}
