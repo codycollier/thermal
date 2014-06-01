@@ -142,9 +142,8 @@ func (sw *Switch) loadPeers(peersFile, peersType string) error {
 
 	peers, err := loadPeersFile(peersFile, peersType)
 	log.Printf("Loaded peers of type %s", peersType)
-	log.Printf("Loaded peers %s", peers)
 	for _, peer := range peers {
-		log.Printf("peer: %s", peer)
+		log.Printf("peer: %s", &peer)
 	}
 
 	if err != nil {

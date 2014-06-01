@@ -1,5 +1,9 @@
 package thermal
 
+import (
+	"fmt"
+)
+
 type path struct {
 	pathtype string
 	ip       string
@@ -13,6 +17,10 @@ type peerSwitch struct {
 	paths    []path
 	keys     map[string]string
 	parts    map[string]string
+}
+
+func (p *peerSwitch) String() string {
+	return fmt.Sprintf("peerSwitch(%s)", p.hashname)
 }
 
 type peerStoreRequest struct {
