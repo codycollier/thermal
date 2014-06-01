@@ -13,8 +13,8 @@ func exercise() {
 	start := time.Now()
 	log.Println("Starting exercise")
 
-	idFile := ""
-	seedsFile := "./seeds-test.json"
+	idFile := "./501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f.id"
+	seedsFile := "./seeds-for-ping.json"
 	hintsFile := ""
 
 	s := new(thermal.Switch)
@@ -27,5 +27,4 @@ func exercise() {
 
 func main() {
 	exercise()
-	//panic("")
 }

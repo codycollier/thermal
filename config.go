@@ -61,7 +61,7 @@ func loadPeersFile(peersFile, peerType string) ([]peerSwitch, error) {
 	return peers, nil
 }
 
-//
+// writeIdentityFile will save the local switch identity information to file
 func writeIdentityFile(idFileName string, cpack *cipherPack) error {
 
 	gob.Register(cipherPack{})
@@ -86,7 +86,7 @@ func writeIdentityFile(idFileName string, cpack *cipherPack) error {
 	return nil
 }
 
-//
+// readIdentityFile will read the local switch identity information from file
 func readIdentityFile(idFileName string, cpack *cipherPack) error {
 
 	gob.Register(cipherPack{})
