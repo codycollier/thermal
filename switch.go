@@ -26,6 +26,7 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	log.Println("Starting initialization of switch")
 
+	// Either load a pre-existing identity or generate a new one
 	if idFile != "" {
 		// Read in a pre-existing identity / cipherPack
 		log.Println("Reading in pre-existing cipher pack")
@@ -49,15 +50,18 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 		}
 	}
 
+	// Generate/Re-generate the hashname
 	log.Println("Generating hashname from cipher pack")
 	err = sw.newHashname()
 	if err != nil {
 		return err
 	}
 
+	// Save/Re-save the identity information
 	idfile := fmt.Sprintf("./%s.id", sw.Hashname)
 	writeIdentityFile(idfile, sw.cpack)
 
+	// Setup the stores and load any peers
 	sw.initializeStores()
 
 	if seedsPath != "" {
@@ -77,7 +81,6 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 	log.Println("Finished initialization of switch")
 	log.Println("Switch ready")
 	return nil
-
 }
 
 // newCipherPack generates and sets a new cipherPack
