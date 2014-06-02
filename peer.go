@@ -2,6 +2,7 @@ package thermal
 
 import (
 	"fmt"
+	"log"
 )
 
 // A path is network transport information
@@ -41,10 +42,15 @@ type peerStore struct {
 
 // service is the main loop for handling incoming messages to the store
 func (ps *peerStore) service() {
+	log.Println("Starting peerstore service")
 	for {
+
 		select {
 
 		case request := <-ps.requests:
+
+			log.Println("peerstore: accepted a request")
+
 			if request.peerdata != nil {
 
 				// Update or Create a peer entry
@@ -53,6 +59,7 @@ func (ps *peerStore) service() {
 					request.response <- nil
 				}
 				ps.peerMap[request.hashname] = *request.peerdata
+				log.Println("peerstore: sending a response")
 				request.response <- request.peerdata
 
 			} else {
@@ -64,11 +71,13 @@ func (ps *peerStore) service() {
 					peer.hashname = request.hashname
 					ps.peerMap[request.hashname] = peer
 				}
+				log.Println("peerstore: sending a response")
 				request.response <- &peer
 			}
 
 		default:
 			//
+			//log.Println("default...")
 		}
 	}
 }
@@ -76,6 +85,8 @@ func (ps *peerStore) service() {
 // start will setup the peerStore and start the listening service
 func (ps *peerStore) start(sw *Switch) {
 	ps.sw = sw
+	ps.peerMap = make(map[string]peerSwitch)
+	ps.requests = make(chan *peerStoreRequest)
 	go ps.service()
 }
 

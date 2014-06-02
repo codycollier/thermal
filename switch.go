@@ -28,6 +28,7 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 
 	// Either load a pre-existing identity or generate a new one
 	if idFile != "" {
+
 		// Read in a pre-existing identity / cipherPack
 		log.Println("Reading in pre-existing cipher pack")
 		cpack := make(cipherPack)
@@ -143,10 +144,15 @@ func (sw *Switch) initializeStores() {
 // loadPeers populates the peerstore with pre-existing seeds or hints
 func (sw *Switch) loadPeers(peersFile, peersType string) error {
 
+	response := make(chan *peerSwitch)
+
 	peers, err := loadPeersFile(peersFile, peersType)
 	log.Printf("Loaded peers of type %s", peersType)
+
 	for _, peer := range peers {
-		log.Printf("peer: %s", &peer)
+		sw.peerstore.requests <- &peerStoreRequest{peer.hashname, &peer, response}
+		<-response
+		log.Printf("peer added to peerstore: %s", &peer)
 	}
 
 	if err != nil {
