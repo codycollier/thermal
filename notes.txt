@@ -9,6 +9,8 @@
 next/current items:
 
 IP . loading seeds and hints
+IP . saving/loading other switch state
+
 IP . switching logic
 
 . building a line session
@@ -16,7 +18,6 @@ IP . switching logic
 . channel design and interaction with lines
 
 
-. saving/loading other switch state
 
 
 
@@ -24,40 +25,65 @@ IP . switching logic
 ::::::::::::::  snapshot  ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 --------------------------------------------------------------------------------
 
-[rain test]$go run exercise.go
-2014/05/30 02:10:17.300554 Starting exercise
-2014/05/30 02:10:17.300741 Starting initialization of switch
-2014/05/30 02:10:17.300748 Starting initialization of new cipher pack
-2014/05/30 02:10:17.300783 initialize 3a...
-2014/05/30 02:10:17.301525        csid: 3a
-2014/05/30 02:10:17.301537 fingerprint: 2fc36b1bd5807fbd2bf803a5a64bf91733141e792698b9cfaa21fac76ecd2886
-2014/05/30 02:10:17.301544 Finished initialization of cipher sets
-2014/05/30 02:10:17.301550 Generating hashname from cipher pack
-2014/05/30 02:10:17.301556 Starting hashname creation
-2014/05/30 02:10:17.301590 switch hashname: 501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f
-2014/05/30 02:10:17.301597 Finished hashname creation
-2014/05/30 02:10:17.364228 Finished initialization of switch
-2014/05/30 02:10:17.364249 Switch ready
-2014/05/30 02:10:17.364271 Switch instance created: Switch(501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f)
-2014/05/30 02:10:17.364280 switch hashname: 501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f
-2014/05/30 02:10:17.364290 Finished exercise (63.757494ms)
+[rain _test]$go run exercise.go
+2014/06/01 19:40:24.410208 Starting exercise
+2014/06/01 19:40:24.410405 Starting initialization of switch
+2014/06/01 19:40:24.410416 Starting initialization of new cipher pack
+2014/06/01 19:40:24.410449 initialize 3a...
+2014/06/01 19:40:24.411209        csid: 3a
+2014/06/01 19:40:24.411223 fingerprint: 7f4e2c6f43c98dd7fb697db9987d1b8398242c0f8c6da6f2aa8895a2b0aa4c0f
+2014/06/01 19:40:24.411230 Finished initialization of cipher sets
+2014/06/01 19:40:24.411237 Generating hashname from cipher pack
+2014/06/01 19:40:24.411246 Starting hashname creation
+2014/06/01 19:40:24.411281 switch hashname: bbc1108d6d775a87771ad8a62bc6c4bc42fde55f34b880014163e8e7b39b4ec0
+2014/06/01 19:40:24.411288 Finished hashname creation
+2014/06/01 19:40:24.412111 Loaded peers of type seed
+2014/06/01 19:40:24.412131 peer: peerSwitch(11111111111111111111111114ad2e74fb144cda3f4710d4f40e2c75d975272e)
+2014/06/01 19:40:24.412140 peer: peerSwitch(22222222222222222222222224ad2e74fb144cda3f4710d4f40e2c75d975272e)
+2014/06/01 19:40:24.412147 Finished initialization of switch
+2014/06/01 19:40:24.412153 Switch ready
+2014/06/01 19:40:24.412162 Switch instance created: Switch(bbc1108d6d775a87771ad8a62bc6c4bc42fde55f34b880014163e8e7b39b4ec0)
+2014/06/01 19:40:24.412168 switch hashname: bbc1108d6d775a87771ad8a62bc6c4bc42fde55f34b880014163e8e7b39b4ec0
+2014/06/01 19:40:24.412178 Finished exercise (1.994647ms)
 
-[rain test]$go run ./exercise.go
-2014/05/30 02:14:06.847412 Starting exercise
-2014/05/30 02:14:06.847604 Starting initialization of switch
-2014/05/30 02:14:06.847611 Reading in pre-existing cipher pack
-2014/05/30 02:14:06.848140        csid: 3a
-2014/05/30 02:14:06.848152 fingerprint: 2fc36b1bd5807fbd2bf803a5a64bf91733141e792698b9cfaa21fac76ecd2886
-2014/05/30 02:14:06.848159 Generating hashname from cipher pack
-2014/05/30 02:14:06.848169 Starting hashname creation
-2014/05/30 02:14:06.848203 switch hashname: 501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f
-2014/05/30 02:14:06.848211 Finished hashname creation
-2014/05/30 02:14:06.848879 Finished initialization of switch
-2014/05/30 02:14:06.848891 Switch ready
-2014/05/30 02:14:06.848907 Switch instance created: Switch(501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f)
-2014/05/30 02:14:06.848915 switch hashname: 501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f
-2014/05/30 02:14:06.848925 Finished exercise (1.538256ms)
+[rain _test]$go run ./switch-ping.go
+2014/06/01 19:40:33.812799 Starting exercise
+2014/06/01 19:40:33.812990 Starting initialization of switch
+2014/06/01 19:40:33.812998 Reading in pre-existing cipher pack
+2014/06/01 19:40:33.870797        csid: 3a
+2014/06/01 19:40:33.870830 fingerprint: 2fc36b1bd5807fbd2bf803a5a64bf91733141e792698b9cfaa21fac76ecd2886
+2014/06/01 19:40:33.870839  public_key: la6cKhlVYrXAPBFI50v/8pAQKKUe6FgvxtHyJ2pJGyA=
+2014/06/01 19:40:33.870846 Generating hashname from cipher pack
+2014/06/01 19:40:33.870857 Starting hashname creation
+2014/06/01 19:40:33.870895 switch hashname: 501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f
+2014/06/01 19:40:33.870903 Finished hashname creation
+2014/06/01 19:40:33.890622 Loaded peers of type seed
+2014/06/01 19:40:33.890669 peer: peerSwitch(c0dbd9479df1fdeb16ae2ef3e5de93d8a5ff54d4d69b7a3e835f96729189ec68)
+2014/06/01 19:40:33.890688 Finished initialization of switch
+2014/06/01 19:40:33.890702 Switch ready
+2014/06/01 19:40:33.890722 Switch instance created: Switch(501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f)
+2014/06/01 19:40:33.890738 switch hashname: 501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f
+2014/06/01 19:40:33.890760 Finished exercise (77.981183ms)
 
+
+[rain _test]$go run ./switch-pong.go
+2014/06/01 19:40:49.105054 Starting exercise
+2014/06/01 19:40:49.105251 Starting initialization of switch
+2014/06/01 19:40:49.105280 Reading in pre-existing cipher pack
+2014/06/01 19:40:49.159952        csid: 3a
+2014/06/01 19:40:49.160003 fingerprint: b695ad975572f6dd5ae1bb441426fbd02cee9b74116468c4d680813d7afec20b
+2014/06/01 19:40:49.160022  public_key: qI/LYqxz6lqQGza/rpPDITtpX66ijYsUHcqwEoLclWs=
+2014/06/01 19:40:49.160037 Generating hashname from cipher pack
+2014/06/01 19:40:49.160062 Starting hashname creation
+2014/06/01 19:40:49.160228 switch hashname: c0dbd9479df1fdeb16ae2ef3e5de93d8a5ff54d4d69b7a3e835f96729189ec68
+2014/06/01 19:40:49.160250 Finished hashname creation
+2014/06/01 19:40:49.161729 Loaded peers of type seed
+2014/06/01 19:40:49.162120 peer: peerSwitch(501ae97f1b5fcf49af34c9ce53279574ee87fffcc667b659b5a8163d7e48441f)
+2014/06/01 19:40:49.162386 Finished initialization of switch
+2014/06/01 19:40:49.162644 Switch ready
+2014/06/01 19:40:49.162763 Switch instance created: Switch(c0dbd9479df1fdeb16ae2ef3e5de93d8a5ff54d4d69b7a3e835f96729189ec68)
+2014/06/01 19:40:49.162776 switch hashname: c0dbd9479df1fdeb16ae2ef3e5de93d8a5ff54d4d69b7a3e835f96729189ec68
+2014/06/01 19:40:49.162809 Finished exercise (57.759725ms)
 
 
 --------------------------------------------------------------------------------
