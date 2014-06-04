@@ -18,6 +18,7 @@ func routeToLine() {
 
 type lineStoreRequest struct {
 	hashname string
+	// what about a pointer to a peer entry?  Or do we look that up later?
 	response chan *lineSession
 }
 
