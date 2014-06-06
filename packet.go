@@ -58,18 +58,12 @@ func decodePacket(packetBytes []byte) (decodedPacket, error) {
 	return packet, nil
 }
 
-// encodePacket accepts json and body payloads and encodes them to a packet
-func encodePacket(json string, body []byte) ([]byte, error) {
+// encodePacket accepts head and body payloads and encodes them to a packet
+func encodePacket(head, body []byte) ([]byte, error) {
 
 	var packet = make([]byte, 0)
-	var err error
-
 	var headLength = make([]byte, 2)
-	var head []byte = nil
-
-	if json != "" {
-		head = []byte(json)
-	}
+	var err error
 
 	// The head-length will be the first two bytes of the packet (network byte order / big endian)
 	binary.BigEndian.PutUint16(headLength, uint16(len(head)))

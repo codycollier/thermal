@@ -143,9 +143,9 @@ func (line *lineSession) newLocalLine() {
 	// to == remoteHashname
 	// parts will be retrieved over in the openMaker()?
 	// line.local.id
-	json := "{}"
+	jsonHead := []byte("{}")
 	body := line.cset.pubKey()[:]
-	packet, err := encodePacket(json, body)
+	packet, err := encodePacket(jsonHead, body)
 	openPacketBody, localLineSecret, err := line.cset.encryptOpenPacketBody(packet, line.remotePublicKey)
 	if err != nil {
 		log.Printf("Error encrypting open packet body (err: %s)", err)
@@ -157,8 +157,8 @@ func (line *lineSession) newLocalLine() {
 	// todo
 	// the head needs to be a single byte, representing the csid
 	// the encodePacket() function is not setup to handle that as-is
-	openPacketJson := ""
-	openPacket, err := encodePacket(openPacketJson, openPacketBody)
+	openPacketHead := []byte("")
+	openPacket, err := encodePacket(openPacketHead, openPacketBody)
 	if err != nil {
 		log.Printf("Error encoding open packet (err: %s)", err)
 		return

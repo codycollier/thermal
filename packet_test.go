@@ -7,10 +7,10 @@ import (
 
 func TestBasicPacketEncodeDecode(t *testing.T) {
 
-	originaljson := "{\"color\": \"green\"}"
+	originalhead := []byte("{\"color\": \"green\"}")
 	originalbody := []byte("This is a test body")
 
-	encPacket, err := encodePacket(originaljson, originalbody)
+	encPacket, err := encodePacket(originalhead, originalbody)
 	if err != nil {
 		t.Log("Error encoding packet (err: %s)\n", err)
 		t.Fail()
@@ -22,13 +22,13 @@ func TestBasicPacketEncodeDecode(t *testing.T) {
 		t.Fail()
 	}
 
-	t.Logf("packet.json: %s\n", packet.json)
-	t.Logf("originaljson: %s\n", originaljson)
+	t.Logf("packet.head: %s\n", packet.head)
+	t.Logf("originalhead: %s\n", originalhead)
 	t.Logf("packet.body: %s\n", packet.body)
 	t.Logf("originalbody: %s\n", originalbody)
 
-	if packet.json != originaljson {
-		t.Log("json was found to be corrupted by encoding / decoding process")
+	if bytes.Compare(packet.head, originalhead) != 0 {
+		t.Log("head was found to be corrupted by encoding / decoding process")
 		t.Fail()
 	}
 
