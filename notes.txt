@@ -18,6 +18,10 @@ IP . switching logic
 . channel design and interaction with lines
 
 
+. identity
+    . maybe change this to use the id.json style that other apps use
+        in particular, thjs adds '3a_secret': base64-private-key
+
 
 
 

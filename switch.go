@@ -67,11 +67,11 @@ func (sw *Switch) Initialize(idFile, seedsPath, hintsPath string) error {
 
 	if seedsPath != "" {
 		err = sw.loadPeers(seedsPath, "seed")
-
 		if err != nil {
 			log.Printf("Error loading seeds (%s)", seedsPath)
 		}
 	}
+
 	if hintsPath != "" {
 		err = sw.loadPeers(hintsPath, "hint")
 		if err != nil {

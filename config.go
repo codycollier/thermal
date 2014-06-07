@@ -70,7 +70,6 @@ func writeIdentityFile(idFileName string, cpack *cipherPack) error {
 
 	var encodedFileData bytes.Buffer
 	enc := gob.NewEncoder(&encodedFileData)
-
 	err := enc.Encode(cpack)
 	if err != nil {
 		log.Printf("Error encoding data (err: %s)", err)
