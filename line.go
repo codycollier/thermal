@@ -17,8 +17,7 @@ func routeToLine() {
 //-----------------------------------------------------------------------------
 
 type lineStoreRequest struct {
-	hashname string
-	// what about a pointer to a peer entry?  Or do we look that up later?
+	peer     *peerSwitch
 	response chan *lineSession
 }
 
@@ -34,11 +33,11 @@ func (store *lineStore) service() {
 
 		case request := <-store.request:
 			// Get or Create a line for the hashname
-			line, exists := store.lineMap[request.hashname]
+			line, exists := store.lineMap[request.peer.hashname]
 			if !exists {
 				line := new(lineSession)
-				line.start(request.hashname)
-				store.lineMap[request.hashname] = line
+				line.start(line.sw, request.peer)
+				store.lineMap[request.peer.hashname] = line
 			}
 			request.response <- line
 
@@ -64,9 +63,10 @@ type lineHalf struct {
 }
 
 type lineSession struct {
-	remoteHashname  string
-	remotePublicKey *[32]byte
+	sw              *Switch
+	peer            *peerSwitch
 	cset            cipherSet
+	remotePublicKey *[32]byte
 
 	local         lineHalf
 	remote        lineHalf
@@ -110,15 +110,13 @@ func (line *lineSession) service() {
 	}
 }
 
-func (line *lineSession) start(remoteHashname string) {
+func (line *lineSession) start(sw *Switch, peer *peerSwitch) {
 
-	// set some line vars
-	// todo - where to get the cset and remotePublickKey?
-	//		get the public key for a remote hashname from...
-	//		maybe pass them in with the storeRequest()
-	line.remoteHashname = remoteHashname
-	//line.cset = cset
-	//line.remotePublicKey = remotePublicKey
+	// self and remote peer between whom the line will be established
+	line.sw = sw
+	line.peer = peer
+
+	// determine best cipher set which both switches support
 
 	// setup the channels
 	line.openLocal = make(chan bool)
@@ -126,7 +124,7 @@ func (line *lineSession) start(remoteHashname string) {
 	line.send = make(chan decodedPacket)
 	line.recv = make(chan []byte)
 
-	// initialization has not completed yet
+	//
 	line.ready = false
 	line.openLocal <- true
 

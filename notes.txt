@@ -22,6 +22,7 @@ IP . switching logic
     . maybe change this to use the id.json style that other apps use
         in particular, thjs adds '3a_secret': base64-private-key
 
+. review and reconsider public attrs on private structs
 
 
 

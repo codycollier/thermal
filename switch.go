@@ -7,10 +7,21 @@ import (
 
 // Switch provides an api to create, manage, and use a Telehash switch instance
 type Switch struct {
+
+	// identity of the local switch
 	Hashname string
+	admin    string
+	paths    []path
+	cpack    *cipherPack
+
+	// similar to a peerSwitch...
+	// hashname string
+	// admin    string
+	// paths    []path
+	// keys     map[string]string
+	// parts    map[string]string
 
 	// the internal backplane of the switch
-	cpack     *cipherPack
 	linestore *lineStore
 	peerstore *peerStore
 }
