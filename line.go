@@ -2,6 +2,7 @@ package thermal
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"time"
@@ -36,7 +37,7 @@ func (store *lineStore) service() {
 			line, exists := store.lineMap[request.peer.hashname]
 			if !exists {
 				line := new(lineSession)
-				line.start(line.sw, request.peer)
+				line.start(store.sw, request.peer)
 				store.lineMap[request.peer.hashname] = line
 			}
 			request.response <- line
@@ -63,10 +64,9 @@ type lineHalf struct {
 }
 
 type lineSession struct {
-	sw              *Switch
-	peer            *peerSwitch
+	csid            string
 	cset            cipherSet
-	remotePublicKey *[32]byte
+	remotePublicKey [32]byte
 
 	local         lineHalf
 	remote        lineHalf
@@ -86,12 +86,15 @@ func (line *lineSession) service() {
 
 		select {
 
-		case <-line.openLocal:
+		case msg := <-line.openLocal:
+			log.Println("openLocal...")
+			log.Printf("msg: %s", msg)
 			//line.newLocalLine()
 
-		case something := <-line.openRemote:
+		case msg := <-line.openRemote:
+			log.Println("openRemote...")
+			log.Printf("msg: %s", msg)
 			//line.openRemote()
-			log.Println(something)
 
 		default:
 			//
@@ -99,11 +102,17 @@ func (line *lineSession) service() {
 
 		if line.ready {
 			select {
-			case something := <-line.send:
-				log.Println(something)
-			case something := <-line.recv:
-				log.Println(something)
+
+			case msg := <-line.send:
+				log.Println("line send request...")
+				log.Printf("msg: %s", msg)
+
+			case msg := <-line.recv:
+				log.Println("line recv request...")
+				log.Printf("msg: %s", msg)
+
 			default:
+
 			}
 		}
 
@@ -112,11 +121,16 @@ func (line *lineSession) service() {
 
 func (line *lineSession) start(sw *Switch, peer *peerSwitch) {
 
-	// self and remote peer between whom the line will be established
-	line.sw = sw
-	line.peer = peer
-
 	// determine best cipher set which both switches support
+	// todo - getBestCSMatch(sw, peer)
+	agreedCSID := "3a"
+	line.csid = agreedCSID
+	cp := *sw.cpack
+	line.cset = cp[line.csid]
+
+	// set the remotePublicKey for later use (decode from base64)
+	peerKey, _ := base64.StdEncoding.DecodeString(peer.keys[line.csid])
+	copy(line.remotePublicKey[:], peerKey[:])
 
 	// setup the channels
 	line.openLocal = make(chan bool)
@@ -124,7 +138,7 @@ func (line *lineSession) start(sw *Switch, peer *peerSwitch) {
 	line.send = make(chan decodedPacket)
 	line.recv = make(chan []byte)
 
-	//
+	// queue up a message to begin the open process
 	line.ready = false
 	line.openLocal <- true
 
@@ -141,10 +155,11 @@ func (line *lineSession) newLocalLine() {
 	// to == remoteHashname
 	// parts will be retrieved over in the openMaker()?
 	// line.local.id
+	cset := line.cset
 	jsonHead := []byte("{}")
-	body := line.cset.pubKey()[:]
+	body := cset.pubKey()[:]
 	packet, err := encodePacket(jsonHead, body)
-	openPacketBody, localLineSecret, err := line.cset.encryptOpenPacketBody(packet, line.remotePublicKey)
+	openPacketBody, localLineSecret, err := cset.encryptOpenPacketBody(packet, &line.remotePublicKey)
 	if err != nil {
 		log.Printf("Error encrypting open packet body (err: %s)", err)
 		return
