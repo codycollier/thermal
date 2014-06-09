@@ -125,6 +125,7 @@ func (line *lineSession) start(sw *Switch, peer *peerSwitch) {
 	// todo - getBestCSMatch(sw, peer)
 	agreedCSID := "3a"
 	line.csid = agreedCSID
+	// todo - better way to dereference
 	cp := *sw.cpack
 	line.cset = cp[line.csid]
 
